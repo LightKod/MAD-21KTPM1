@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -19,12 +20,16 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.CompoundButtonCompat
 import androidx.fragment.app.Fragment
+import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.google.android.material.textfield.TextInputLayout
 import java.util.regex.Pattern
 
 
 class UserDetailFragment : Fragment() {
+    private lateinit var backBtn: ImageButton
+    private lateinit var menuBtn: ImageButton
+
     private lateinit var inputLayoutUserName: TextInputLayout
     private lateinit var inputLayoutUserPhone: TextInputLayout
     private lateinit var inputLayoutUserEmail: TextInputLayout
@@ -65,6 +70,17 @@ class UserDetailFragment : Fragment() {
     }
 
     private fun init(view: View){
+        backBtn = view.findViewById(R.id.backBtn)
+        menuBtn = view.findViewById(R.id.menuBtn)
+
+        backBtn.setOnClickListener {
+            (this.activity as? MainActivity)?.goBack()
+        }
+
+        menuBtn.setOnClickListener {
+            (this.activity as? MainActivity)?.openDrawer()
+        }
+
         inputLayoutUserName = view.findViewById(R.id.inputLayoutUserName)
         inputLayoutUserPhone = view.findViewById(R.id.inputLayoutUserPhone)
         inputLayoutUserEmail = view.findViewById(R.id.inputLayoutUserEmail)
@@ -139,6 +155,7 @@ class UserDetailFragment : Fragment() {
 
             val datePickerDialog = DatePickerDialog(
                 this.requireContext(),
+                R.style.DialogTheme,
                 DatePickerDialog.OnDateSetListener { _, selectedYear, selectedMonth, selectedDay ->
                     val formattedDay = if (selectedDay < 10) "0${selectedDay}" else "$selectedDay"
                     val formattedMonth = if (selectedMonth + 1 < 10) "0${selectedMonth + 1}" else "${selectedMonth + 1}"
@@ -162,6 +179,7 @@ class UserDetailFragment : Fragment() {
 
             dialogTitle.text = "Choose a gender"
 
+            val black_color = ContextCompat.getColor(this.requireContext(), R.color.black)
             val checked_color = ContextCompat.getColor(this.requireContext(), R.color.red)
             val unchecked_color = ContextCompat.getColor(this.requireContext(), R.color.greytext)
 
@@ -174,6 +192,7 @@ class UserDetailFragment : Fragment() {
                 val radioButton = RadioButton(this.requireContext())
                 radioButton.id = index
                 radioButton.text = option
+                radioButton.setTextColor(black_color)
                 radioButton.layoutDirection = View.LAYOUT_DIRECTION_RTL
                 radioButton.layoutParams = RadioGroup.LayoutParams(
                     RadioGroup.LayoutParams.MATCH_PARENT,
@@ -280,6 +299,7 @@ class UserDetailFragment : Fragment() {
 
             dialogTitle.text = "Choose a city"
 
+            val black_color = ContextCompat.getColor(this.requireContext(), R.color.black)
             val checked_color = ContextCompat.getColor(this.requireContext(), R.color.red)
             val unchecked_color = ContextCompat.getColor(this.requireContext(), R.color.greytext)
 
@@ -292,6 +312,7 @@ class UserDetailFragment : Fragment() {
                 val radioButton = RadioButton(this.requireContext())
                 radioButton.id = index
                 radioButton.text = option
+                radioButton.setTextColor(black_color)
                 radioButton.layoutDirection = View.LAYOUT_DIRECTION_RTL
                 radioButton.layoutParams = RadioGroup.LayoutParams(
                     RadioGroup.LayoutParams.MATCH_PARENT,
@@ -302,7 +323,7 @@ class UserDetailFragment : Fragment() {
                     colorStateList
                 )
                 radioGroup.addView(radioButton)
-                if(option == editTextUserGender.text.toString()){
+                if(option == editTextUserCity.text.toString()){
                     radioButton.isChecked = true
                 }
             }
@@ -325,7 +346,7 @@ class UserDetailFragment : Fragment() {
         }
 
         saveBtn.setOnClickListener {
-            if(inputLayoutUserName.isErrorEnabled == true || inputLayoutUserPhone.isErrorEnabled == true){
+            if(inputLayoutUserName.isErrorEnabled || inputLayoutUserPhone.isErrorEnabled){
                 Toast.makeText(this.requireContext(), "You haven't filled out the form yet", Toast.LENGTH_SHORT).show()
             }
             else{

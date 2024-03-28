@@ -10,6 +10,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.example.mad_21ktpm1_group11.fragments.BookByMovieFragment
 import com.example.mad_21ktpm1_group11.fragments.HomeFragment
 import com.example.mad_21ktpm1_group11.fragments.UserDashboardFragment
 
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var frameLayout: FrameLayout
     private lateinit var homeBtn: Button
     private lateinit var memberBtn: Button
+    private lateinit var bookByMovieBtn: Button
     /*    private lateinit var catViewBtn: Button
         private lateinit var homeViewBtn: Button*/
 
@@ -35,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         frameLayout = findViewById(R.id.frame_layout)
         homeBtn = findViewById(R.id.home_btn)
         memberBtn = findViewById(R.id.user_btn)
+        bookByMovieBtn = findViewById(R.id.book_by_movie_btn)
 
         supportFragmentManager.addOnBackStackChangedListener {
             Log.i("meo", "${supportFragmentManager.backStackEntryCount}")
@@ -50,6 +53,10 @@ class MainActivity : AppCompatActivity() {
 
         memberBtn.setOnClickListener {
             addFragment(UserDashboardFragment(), "member")
+        }
+
+        bookByMovieBtn.setOnClickListener {
+            addFragment(BookByMovieFragment(), "book_by_movie")
         }
     }
 

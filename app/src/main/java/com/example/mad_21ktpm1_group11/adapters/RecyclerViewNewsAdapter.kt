@@ -21,7 +21,7 @@ class RecyclerViewNewsAdapter(private val fragment : Fragment, private val news:
         val context = parent.context
         val inflater = LayoutInflater.from(context)
 
-        val view = inflater.inflate(R.layout.recyclerview_item_container, parent, false)
+        val view = inflater.inflate(R.layout.recyclerview_news_item_container, parent, false)
 
         return ViewHolder(view)
     }
