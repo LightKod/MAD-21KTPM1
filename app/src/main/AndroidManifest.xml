@@ -15,6 +15,23 @@
         android:theme="@style/Theme.MAD21KTPM1Group11"
         tools:targetApi="31">
         <activity
+            android:name=".SeatSelectionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SeatSelectionView"
+            android:exported="false" />
+        <activity
+            android:name=".MovieDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Test.ui.TestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Test.TestActivity"
+            android:exported="false"
+            android:label="@string/title_activity_test"
+            android:theme="@style/Theme.MAD21KTPM1Group11" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
