@@ -1,11 +1,10 @@
-package com.example.mad_21ktpm1_group11
+package com.example.mad_21ktpm1_group11.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -18,7 +17,14 @@ import androidx.viewpager2.widget.MarginPageTransformer
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.android.material.appbar.AppBarLayout
+import com.example.mad_21ktpm1_group11.MainActivity
+import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.adapters.ImageAdapter
+import com.example.mad_21ktpm1_group11.adapters.ImageURLAdapter
+import com.example.mad_21ktpm1_group11.adapters.RecyclerViewNewsAdapter
+import com.example.mad_21ktpm1_group11.adapters.SliderMenuAdapter
+import com.example.mad_21ktpm1_group11.decorators.SpacingItemDecorator
+import com.example.mad_21ktpm1_group11.models.News
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlin.math.abs
 

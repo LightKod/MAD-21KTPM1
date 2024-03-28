@@ -1,4 +1,4 @@
-package com.example.mad_21ktpm1_group11
+package com.example.mad_21ktpm1_group11.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,6 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import com.example.mad_21ktpm1_group11.MainActivity
+import com.example.mad_21ktpm1_group11.R
 
 class SliderMenuFirstFragment : Fragment() {
 

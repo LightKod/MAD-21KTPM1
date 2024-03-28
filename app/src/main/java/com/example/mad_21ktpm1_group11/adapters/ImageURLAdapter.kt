@@ -1,6 +1,5 @@
-package com.example.mad_21ktpm1_group11
+package com.example.mad_21ktpm1_group11.adapters
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,20 +7,13 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.mad_21ktpm1_group11.R
 
-class ImageAdapter(private val fragment : Fragment, private val imageList : ArrayList<Int>)
-    : RecyclerView.Adapter<ImageAdapter.ImageViewHolder>(){
-
-    lateinit var onItemClick: ((Int) -> Unit)
+class ImageURLAdapter(private val fragment : Fragment, private val imageList : ArrayList<String>)
+    : RecyclerView.Adapter<ImageURLAdapter.ImageViewHolder>() {
 
     inner class ImageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val imageView: ImageView = itemView.findViewById(R.id.imageView)
-
-        init{
-            itemView.setOnClickListener {
-                onItemClick.invoke(imageList[position])
-            }
-        }
     }
 
     init{

@@ -1,4 +1,4 @@
-package com.example.mad_21ktpm1_group11
+package com.example.mad_21ktpm1_group11.adapters
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager

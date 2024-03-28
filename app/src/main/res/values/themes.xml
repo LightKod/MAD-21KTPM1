@@ -7,4 +7,8 @@
     </style>
 
     <style name="Theme.MAD21KTPM1Group11" parent="Base.Theme.MAD21KTPM1Group11" />
+
+    <style name="ThemeOverlay.AppTheme.TextInputEditText.Filled" parent="">
+        <item name="colorControlActivated">@color/black</item>
+    </style>
 </resources>

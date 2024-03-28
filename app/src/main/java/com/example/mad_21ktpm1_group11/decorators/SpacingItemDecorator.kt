@@ -1,4 +1,4 @@
-package com.example.mad_21ktpm1_group11
+package com.example.mad_21ktpm1_group11.decorators
 
 import android.content.Context
 import android.graphics.Rect

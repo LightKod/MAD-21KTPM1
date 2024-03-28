@@ -1,4 +1,4 @@
-package com.example.mad_21ktpm1_group11
+package com.example.mad_21ktpm1_group11.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.mad_21ktpm1_group11.models.News
+import com.example.mad_21ktpm1_group11.R
 
 class RecyclerViewNewsAdapter(private val fragment : Fragment, private val news: List<News>): RecyclerView.Adapter<RecyclerViewNewsAdapter.ViewHolder>() {
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
@@ -15,7 +17,7 @@ class RecyclerViewNewsAdapter(private val fragment : Fragment, private val news:
         val cardText = view.findViewById<TextView>(R.id.cardText)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerViewNewsAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val context = parent.context
         val inflater = LayoutInflater.from(context)
 
