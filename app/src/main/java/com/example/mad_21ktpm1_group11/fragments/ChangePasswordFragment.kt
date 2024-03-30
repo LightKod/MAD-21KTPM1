@@ -99,6 +99,10 @@ class ChangePasswordFragment : Fragment() {
                     inputLayoutNewPassword.error = "This field cannot be empty"
                     inputLayoutNewPassword.isErrorEnabled = true
                 }
+                else if(newPassword.length < 6){
+                    inputLayoutNewPassword.error = "The password must have at least 6 characters"
+                    inputLayoutNewPassword.isErrorEnabled = true
+                }
                 else if(!pattern.matcher(newPassword).find()){
                     inputLayoutNewPassword.error = "The password must have at least one uppercase letter, one lowercase letter, a number and a special character (eg. [!@#\$%^&*()-+=])"
                     inputLayoutNewPassword.isErrorEnabled = true

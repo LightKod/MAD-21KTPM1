@@ -38,10 +38,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="100dp"
             android:layout_marginEnd="8dp"
-            android:ellipsize="end"
-            android:maxLines="1"
             android:text="Movie's Name"
             android:textAllCaps="true"
             android:textColor="@color/black"
@@ -58,7 +56,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
             android:text="Movie Director's Name"
             android:textColor="@color/black"
@@ -70,15 +67,13 @@
 
         <TextView
             android:id="@+id/textViewMoviePremiereDate"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginTop="4dp"
             android:text="01/01/2000"
             android:textColor="@color/greytext"
             app:layout_constraintBottom_toTopOf="@id/textViewMovieDuration"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textViewMovieDirector" />
 
@@ -88,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="100dp"
             android:text="125 min"
             android:textColor="@color/greytext"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -96,5 +91,23 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewMoviePremiereDate" />
+
+        <android.widget.Button
+            android:id="@+id/movieClassification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/movie_classification"
+            android:backgroundTint="@color/black"
+            android:clickable="false"
+            android:minWidth="28dp"
+            android:minHeight="0dp"
+            android:text="K"
+            android:textColor="@color/black"
+            android:textSize="8sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/textViewMoviePremiereDate"
+            app:layout_constraintStart_toEndOf="@+id/textViewMoviePremiereDate"
+            app:layout_constraintTop_toTopOf="@+id/textViewMoviePremiereDate" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
