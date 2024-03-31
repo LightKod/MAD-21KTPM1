@@ -1,10 +1,13 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -24,6 +27,7 @@ import com.example.mad_21ktpm1_group11.adapters.ImageURLAdapter
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewNewsAdapter
 import com.example.mad_21ktpm1_group11.adapters.SliderMenuAdapter
 import com.example.mad_21ktpm1_group11.decorators.SpacingItemDecorator
+import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.News
 import jp.wasabeef.glide.transformations.BlurTransformation
 import kotlin.math.abs
@@ -44,10 +48,12 @@ class HomeFragment : Fragment() {
 
     private lateinit var textViewMovieName: TextView
     private lateinit var textViewMovieInfo: TextView
+    private lateinit var movieClassification: Button
 
     private lateinit var movieImageList: ArrayList<Int>
     private lateinit var advertisementImageList: ArrayList<String>
     private lateinit var newsList: ArrayList<News>
+    private lateinit var movieList: ArrayList<Movie>
 
     private lateinit var viewPagerMovieListAdapter: ImageAdapter
     private lateinit var viewPagerAdvertisementAdapter: ImageURLAdapter
@@ -90,6 +96,20 @@ class HomeFragment : Fragment() {
 
         textViewMovieName = view.findViewById(R.id.textViewMovieName)
         textViewMovieInfo = view.findViewById(R.id.textViewMovieInfo)
+        movieClassification = view.findViewById(R.id.movieClassification)
+
+        movieList = ArrayList()
+        for(i in 1..10){
+            movieList.add(Movie(
+                i,
+                "Movie name $i",
+                if (i % 5 == 1) "T13" else if (i % 5 == 2) "T16" else if (i % 5 == 3) "T18" else if (i % 5 == 4) "K" else "P",
+                "01/01/2000",
+                125 + i,
+                "Meo meo",
+                ""
+            ))
+        }
 
         movieImageList = ArrayList()
         movieImageList.add(R.drawable.one)
@@ -133,12 +153,13 @@ class HomeFragment : Fragment() {
         viewPagerMovieList.clipChildren = false
         viewPagerMovieList.setCurrentItem(1, false)
 
-        textViewMovieName.setText(movieImageList[1])
-        textViewMovieInfo.setText(movieImageList[1])
+        textViewMovieName.setText(movieList[1].name)
+        textViewMovieInfo.setText(movieList[1].name)
         Glide.with(this)
             .load(movieImageList[1])
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
             .into(imageViewDashboardBackground)
+        setMovieClassification(movieList[1])
 
 
         val movieListTransformer = CompositePageTransformer()
@@ -190,13 +211,15 @@ class HomeFragment : Fragment() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
 
-                textViewMovieName.setText(movieImageList[position])
-                textViewMovieInfo.setText(movieImageList[position])
+                val item = movieList[position]
+                textViewMovieName.text = item.name
+                textViewMovieInfo.text = item.premiereDate
                 Glide.with(this@HomeFragment)
                     .load(movieImageList[position])
                     .placeholder(R.drawable.black)
                     .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
                     .into(imageViewDashboardBackground)
+                setMovieClassification(item)
             }
         })
 
@@ -220,6 +243,41 @@ class HomeFragment : Fragment() {
 
         addInfiniteScroll(viewPagerMovieList)
         addInfiniteScroll(viewPagerAdvertisement)
+    }
+
+    private fun setMovieClassification(item: Movie){
+        when(item.classification){
+            "P" -> {
+                movieClassification.text = "P"
+                movieClassification.setTextColor(Color.parseColor("#799D46"))
+                movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#799D46"))
+            }
+            "K" -> {
+                movieClassification.text = "K"
+                movieClassification.setTextColor(Color.parseColor("#1A9ABD"))
+                movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#1A9ABD"))
+            }
+            "T13" -> {
+                movieClassification.text = "T13"
+                movieClassification.setTextColor(Color.parseColor("#E8E10A"))
+                movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E8E10A"))
+            }
+            "T16" -> {
+                movieClassification.text = "T16"
+                movieClassification.setTextColor(Color.parseColor("#F3A001"))
+                movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F3A001"))
+            }
+            "T18" -> {
+                movieClassification.text = "T18"
+                movieClassification.setTextColor(Color.parseColor("#EA3B24"))
+                movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#EA3B24"))
+            }
+            else -> {
+                movieClassification.text = "U"
+                movieClassification.setTextColor(Color.parseColor("#000000"))
+                movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#000000"))
+            }
+        }
     }
 
     private fun addInfiniteScroll(viewPager2: ViewPager2){

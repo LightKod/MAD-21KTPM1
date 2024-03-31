@@ -19,7 +19,7 @@ class ImageAdapter(private val fragment : Fragment, private val imageList : Arra
 
         init{
             itemView.setOnClickListener {
-                onItemClick.invoke(imageList[position])
+                onItemClick.invoke(imageList[adapterPosition])
             }
         }
     }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -73,5 +74,9 @@ class BookByMovieFragment : Fragment() {
         val dividerItemDecoration: DividerItemDecoration = DividerItemDecoration(recyclerViewMovieList.context, LinearLayoutManager.VERTICAL)
         dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this.requireContext(), R.drawable.item_divider)!!)
         recyclerViewMovieList.addItemDecoration(dividerItemDecoration)
+
+        recyclerViewMovieListAdapter.onItemClick = {id ->
+            Toast.makeText(this.requireContext(), "Clicked item: $id", Toast.LENGTH_SHORT).show()
+        }
     }
 }

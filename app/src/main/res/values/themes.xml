@@ -21,4 +21,8 @@
     <style name="DialogButtonStyled" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">@color/red</item> <!-- button text color -->
     </style>
+    
+    <style name="PaymentRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="buttonTint">@color/red</item>
+    </style>
 </resources>

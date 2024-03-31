@@ -7,4 +7,5 @@
     <color name="divider">#DAD6CB</color>
     <color name="pink">#9E1064</color>
     <color name="greytext">#787878</color>
+    <color name="darker_greytext">#444444</color>
 </resources>
