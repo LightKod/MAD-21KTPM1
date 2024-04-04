@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.example.mad_21ktpm1_group11.fragments.BookByMovieFragment
 import com.example.mad_21ktpm1_group11.fragments.HomeFragment
+import com.example.mad_21ktpm1_group11.fragments.PaymentPreviewFragment
 import com.example.mad_21ktpm1_group11.fragments.UserDashboardFragment
 
 class MainActivity : AppCompatActivity() {
@@ -20,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var homeBtn: Button
     private lateinit var memberBtn: Button
     private lateinit var bookByMovieBtn: Button
+
+    private lateinit var ticketBtn: Button
     /*    private lateinit var catViewBtn: Button
         private lateinit var homeViewBtn: Button*/
 
@@ -39,6 +42,8 @@ class MainActivity : AppCompatActivity() {
         memberBtn = findViewById(R.id.user_btn)
         bookByMovieBtn = findViewById(R.id.book_by_movie_btn)
 
+        ticketBtn = findViewById(R.id.ticket_btn)
+
         supportFragmentManager.addOnBackStackChangedListener {
             Log.i("meo", "${supportFragmentManager.backStackEntryCount}")
         }
@@ -57,6 +62,10 @@ class MainActivity : AppCompatActivity() {
 
         bookByMovieBtn.setOnClickListener {
             addFragment(BookByMovieFragment(), "book_by_movie")
+        }
+
+        ticketBtn.setOnClickListener {
+            addFragment(PaymentPreviewFragment(), "payment")
         }
     }
 

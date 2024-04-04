@@ -15,6 +15,8 @@ import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.models.Movie
 
 class RecyclerViewMovieAdapter(private val fragment : Fragment, private val movies: List<Movie>): RecyclerView.Adapter<RecyclerViewMovieAdapter.ViewHolder>() {
+    lateinit var onItemClick: ((Int) -> Unit)
+
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
         val moviePoster = view.findViewById<ImageView>(R.id.moviePoster)
         val textViewMovieName = view.findViewById<TextView>(R.id.textViewMovieName)
@@ -22,6 +24,12 @@ class RecyclerViewMovieAdapter(private val fragment : Fragment, private val movi
         val textViewMoviePremiereDate = view.findViewById<TextView>(R.id.textViewMoviePremiereDate)
         val textViewMovieDuration = view.findViewById<TextView>(R.id.textViewMovieDuration)
         val movieClassification = view.findViewById<Button>(R.id.movieClassification)
+
+        init{
+            view.setOnClickListener {
+                onItemClick.invoke(movies[adapterPosition].id)
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
