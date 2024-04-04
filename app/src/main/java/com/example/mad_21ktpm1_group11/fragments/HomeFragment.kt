@@ -34,6 +34,7 @@ import kotlin.math.abs
 
 class HomeFragment : Fragment() {
     private lateinit var menuBtn: ImageButton
+    private lateinit var ticketBtn: ImageButton
 
     private lateinit var imageViewDashboardBackground: ImageView
 
@@ -86,6 +87,8 @@ class HomeFragment : Fragment() {
         imageViewDashboardBackground = view.findViewById(R.id.imageViewDashboardBackground)
 
         menuBtn = view.findViewById(R.id.menuBtn)
+        ticketBtn = view.findViewById(R.id.ticketBtn)
+
         viewPagerAdvertisement = view.findViewById(R.id.viewPagerAdvertisement)
         viewPagerMovieList = view.findViewById(R.id.viewPagerMovieList)
         viewPagerPromotion = view.findViewById(R.id.viewPagerPromotion)
@@ -137,6 +140,10 @@ class HomeFragment : Fragment() {
 
         menuBtn.setOnClickListener {
             (this.activity as? MainActivity)?.openDrawer()
+        }
+
+        ticketBtn.setOnClickListener {
+            (this.activity as? MainActivity)?.addFragment(TicketFragment(), "ticket")
         }
 
         imageViewUserIcon.setOnClickListener {
