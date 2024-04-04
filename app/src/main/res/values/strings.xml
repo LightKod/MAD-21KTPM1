@@ -13,4 +13,6 @@
     <string name="hint_confirm_password">Confirm password <font color="#AD2B33">*</font></string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="forgot_password_text"><![CDATA[Quên <u>mật khẩu</u>]]></string>
+
 </resources>
