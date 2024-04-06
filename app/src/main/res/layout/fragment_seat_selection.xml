@@ -9,6 +9,7 @@
     tools:context=".fragments.SeatSelectionFragment">
 
     <RelativeLayout
+        android:id="@+id/outerLayout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#222222"
@@ -20,8 +21,8 @@
 
         <com.example.mad_21ktpm1_group11.classes.ZoomLayout
             android:id="@+id/zoomLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </RelativeLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
