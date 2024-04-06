@@ -2,72 +2,88 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SeatSelectionActivity">
+    android:background="#00FFFFFF"
+    tools:context=".fragments.SeatSelectionFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/seatLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="100dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#222222"
+        app:layout_constraintBottom_toTopOf="@+id/bottomView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.example.mad_21ktpm1_group11.classes.ZoomLayout
+            android:id="@+id/zoomLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
 
-    <TextView
-        android:id="@+id/textMovieName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
-        android:text="Kungfu Panda"
-        android:textSize="18dp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seatLayout" />
-
-    <TextView
-        android:id="@+id/textScreenType"
-        android:layout_width="101dp"
-        android:layout_height="18dp"
-        android:text="2D Vietnam Sub"
-        app:layout_constraintStart_toStartOf="@+id/textMovieName"
-        app:layout_constraintTop_toBottomOf="@+id/textMovieName" />
-
-    <TextView
-        android:id="@+id/textPrice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:text="75.000đ"
-        android:textSize="16dp"
-        android:textStyle="bold"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bottomView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/textMovieName" />
-
-    <TextView
-        android:id="@+id/textChair"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:text="1 ghế"
-        app:layout_constraintBottom_toBottomOf="@+id/textPrice"
-        app:layout_constraintStart_toEndOf="@+id/textPrice"
-        app:layout_constraintTop_toTopOf="@+id/textPrice" />
-
-    <Button
-        android:id="@+id/buttonOrder"
-        android:layout_width="105dp"
-        android:layout_height="45dp"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="10dp"
-        android:backgroundTint="#A03536"
-        android:text="Đặt vé"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/seatLayout" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/textMovieName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:text="Kungfu Panda"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textScreenType"
+            android:layout_width="101dp"
+            android:layout_height="18dp"
+            android:text="2D Vietnam Sub"
+            app:layout_constraintStart_toStartOf="@+id/textMovieName"
+            app:layout_constraintTop_toBottomOf="@+id/textMovieName" />
+
+        <TextView
+            android:id="@+id/textPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="9dp"
+            android:text="75.000đ"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/textMovieName" />
+
+        <TextView
+            android:id="@+id/textChair"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="10dp"
+            android:text="1 seat selected"
+            app:layout_constraintBottom_toBottomOf="@+id/textPrice"
+            app:layout_constraintStart_toEndOf="@+id/textPrice"
+            app:layout_constraintTop_toTopOf="@+id/textPrice" />
+
+        <Button
+            android:id="@+id/buttonOrder"
+            android:layout_width="105dp"
+            android:layout_height="45dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="10dp"
+            android:backgroundTint="#A03536"
+            android:text="Order"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
