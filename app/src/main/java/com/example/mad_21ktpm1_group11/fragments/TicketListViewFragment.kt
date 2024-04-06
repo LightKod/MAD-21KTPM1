@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewTicketAdapter
 import com.example.mad_21ktpm1_group11.models.Ticket
@@ -70,6 +71,7 @@ class TicketListViewFragment : Fragment() {
 
         recyclerViewAdapter.onItemClick = {id ->
             Toast.makeText(this.requireContext(), "Clicked item: $id", Toast.LENGTH_SHORT).show()
+            (this.activity as? MainActivity)?.addFragment(TicketDetailFragment(), "ticket_detail")
         }
 
         return view
