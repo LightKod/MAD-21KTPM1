@@ -1,19 +1,28 @@
 package com.example.mad_21ktpm1_group11
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.cardview.widget.CardView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.example.mad_21ktpm1_group11.fragments.BookByMovieFragment
 import com.example.mad_21ktpm1_group11.fragments.HomeFragment
+import com.example.mad_21ktpm1_group11.fragments.LoginFragment
 import com.example.mad_21ktpm1_group11.fragments.PaymentPreviewFragment
 import com.example.mad_21ktpm1_group11.fragments.UserDashboardFragment
+import jp.wasabeef.glide.transformations.BlurTransformation
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -23,8 +32,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bookByMovieBtn: Button
 
     private lateinit var ticketBtn: Button
-    /*    private lateinit var catViewBtn: Button
-        private lateinit var homeViewBtn: Button*/
+
+    var isLoggedIn: Boolean = true
+    private lateinit var loginBtn: TextView
+    private lateinit var userName: TextView
+    private lateinit var memberCode: TextView
+    private lateinit var userCode: CardView
+    private lateinit var logoutBtn: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         init()
         addButtonClickEvent()
-
+        toggleNavbarUser()
     }
 
     fun init(){
@@ -43,6 +57,12 @@ class MainActivity : AppCompatActivity() {
         bookByMovieBtn = findViewById(R.id.book_by_movie_btn)
 
         ticketBtn = findViewById(R.id.ticket_btn)
+
+        loginBtn = findViewById(R.id.login_btn)
+        userName = findViewById(R.id.user_name)
+        memberCode = findViewById(R.id.member_code)
+        userCode = findViewById(R.id.user_code)
+        logoutBtn = findViewById(R.id.logout_btn)
 
         supportFragmentManager.addOnBackStackChangedListener {
             Log.i("meo", "${supportFragmentManager.backStackEntryCount}")
@@ -67,13 +87,22 @@ class MainActivity : AppCompatActivity() {
         ticketBtn.setOnClickListener {
             addFragment(PaymentPreviewFragment(), "payment")
         }
+
+        loginBtn.setOnClickListener {
+            addFragment(LoginFragment(), "login")
+        }
+
+        logoutBtn.setOnClickListener {
+            isLoggedIn = false
+            toggleNavbarUser()
+        }
     }
 
     fun openDrawer(){
         drawerLayout.openDrawer(GravityCompat.END)
     }
 
-    fun getCurrentFragmentName(): String? {
+    private fun getCurrentFragmentName(): String? {
         val fragmentManager = supportFragmentManager
         val backStackCount = fragmentManager.backStackEntryCount
 
@@ -87,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 
-    fun replaceFragment(fragment: Fragment, name: String? = null){
+    private fun replaceFragment(fragment: Fragment, name: String? = null){
         val fragmentManager: FragmentManager = supportFragmentManager
         val fragmentTransaction: FragmentTransaction = fragmentManager.beginTransaction()
 
@@ -102,9 +131,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun clearAllFragments(){
+        val fragmentManager: FragmentManager = supportFragmentManager
+        fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+    }
+
+
     fun addFragment(fragment: Fragment, name: String? = null){
-        if(getCurrentFragmentName() != name)
-            replaceFragment(fragment, name)
+        val fragmentName = getCurrentFragmentName()
+        if(fragmentName != name) {
+            if(name == "home"){
+                clearAllFragments()
+                replaceFragment(HomeFragment(), "home")
+            }
+            else{
+                replaceFragment(fragment, name)
+            }
+        }
     }
 
     fun goBack(){
@@ -129,5 +172,13 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
 
+    }
+
+    fun toggleNavbarUser(){
+        loginBtn.visibility = if(isLoggedIn) View.GONE else View.VISIBLE
+        userName.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
+        memberCode.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
+        userCode.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
+        logoutBtn.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
     }
 }

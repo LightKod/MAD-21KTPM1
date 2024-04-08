@@ -3,6 +3,8 @@ package com.example.mad_21ktpm1_group11.fragments
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -63,6 +65,8 @@ class HomeFragment : Fragment() {
     private lateinit var viewPagerSliderMenuAdapter: SliderMenuAdapter
 
     private lateinit var imageViewUserIcon: ImageView
+
+    private lateinit var handler: Handler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -155,6 +159,8 @@ class HomeFragment : Fragment() {
         imageViewUserIcon.setOnClickListener {
             (this.activity as? MainActivity)?.addFragment(UserDashboardFragment(), "member")
         }
+
+        handler = Handler(Looper.myLooper()!!)
     }
 
     private fun initViewPagers() {
@@ -238,6 +244,7 @@ class HomeFragment : Fragment() {
 
         viewPagerMovieListAdapter.onItemClick = { name ->
             Toast.makeText(context, "Item clicked: " + name, Toast.LENGTH_SHORT).show()
+            (this.activity as? MainActivity)?.addFragment(MovieDetailFragment(), "movie_detail")
         }
 
         viewPagerSliderMenu.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
@@ -256,6 +263,14 @@ class HomeFragment : Fragment() {
 
         addInfiniteScroll(viewPagerMovieList)
         addInfiniteScroll(viewPagerAdvertisement)
+
+        viewPagerAdvertisement.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                handler.removeCallbacks(runnable)
+                handler.postDelayed(runnable, 5000)
+            }
+        })
     }
 
     private fun setMovieClassification(item: Movie){
@@ -318,5 +333,19 @@ class HomeFragment : Fragment() {
         recyclerViewNews.adapter = recyclerViewNewsAdapter
         recyclerViewNews.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false)
         recyclerViewNews.addItemDecoration(SpacingItemDecorator(this.requireContext(), 50))
+    }
+
+    private val runnable = Runnable{
+        viewPagerAdvertisement.currentItem = viewPagerAdvertisement.currentItem + 1
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(runnable)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handler.postDelayed(runnable, 5000)
     }
 }
