@@ -1,4 +1,4 @@
-package com.example.mad_21ktpm1_group11.classes
+package com.example.mad_21ktpm1_group11.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,7 +7,6 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.OnScaleGestureListener
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 
 
@@ -160,6 +159,7 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
     }
 
     private fun child(): View {
+        if(childCount == 0) return View(context)
         return getChildAt(0)
     }
 

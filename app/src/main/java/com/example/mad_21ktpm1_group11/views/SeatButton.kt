@@ -1,4 +1,4 @@
-package com.example.mad_21ktpm1_group11.classes
+package com.example.mad_21ktpm1_group11.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -24,8 +24,6 @@ class SeatButton : AppCompatButton {
         return false
     }
 
-    // Because we call this from onTouchEvent, this code will be executed for both
-    // normal touch events and for when the system calls this using Accessibility
     override fun performClick(): Boolean {
         super.performClick()
         return true
