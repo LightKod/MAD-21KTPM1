@@ -1,4 +1,4 @@
-package com.example.mad_21ktpm1_group11.classes
+package com.example.mad_21ktpm1_group11.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,7 +7,6 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.OnScaleGestureListener
 import android.view.View
-import android.view.ViewGroup
 import android.widget.RelativeLayout
 
 
@@ -34,6 +33,9 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
     val screenWidth = displayMetrics.widthPixels
     val screenHeight = displayMetrics.heightPixels
 
+    var childWidth = 0;
+    var childHeight = 0;
+
     constructor(context: Context?) : super(context) {
         init(context)
     }
@@ -50,6 +52,12 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
         init(context)
     }
 
+    public fun SetSize(width: Int,height: Int )
+    {
+        childWidth = width;
+        childHeight = height;
+    }
+
     fun init(context: Context?) {
         val scaleDetector = ScaleGestureDetector(context!!, this)
         setOnTouchListener { view, motionEvent ->
@@ -59,9 +67,9 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
             when (motionEvent.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
                     Log.i(TAG, "DOWN")
-                        mode = Mode.DRAG
-                        startX = motionEvent.x - prevDx
-                        startY = motionEvent.y - prevDy
+                    mode = Mode.DRAG
+                    startX = motionEvent.x - prevDx
+                    startY = motionEvent.y - prevDy
 
                     val lParams = view.layoutParams as RelativeLayout.LayoutParams
                 }
@@ -86,26 +94,34 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
                 }
             }
             scaleDetector.onTouchEvent(motionEvent)
-                parent.requestDisallowInterceptTouchEvent(true)
+            parent.requestDisallowInterceptTouchEvent(true)
 
-                val maxDx = (child().width - child().width / scale) / 2 * scale
-                val maxDy = (child().height - child().height / scale) / 2 * scale
-                dx = Math.min(Math.max(dx, -maxDx - (child().width - screenWidth - screenWidth/2)), maxDx + (child().width - screenWidth - screenWidth/2))
-                dy = Math.min(Math.max(dy, -maxDy  - (child().height - screenHeight + 150)), maxDy + (child().height - screenHeight + 150))
+            //val maxDx = (childWidth - childWidth/ scale) / 2 * scale
+            //val maxDy = (childHeight - childHeight/ scale) / 2 * scale
+            val deltaX = (childWidth - screenWidth)
+            val deltaY = (childHeight - screenHeight)
+            //val maxDx = (deltaX - deltaX/ scale) / 2 * scale
+            //val maxDy = (deltaY - deltaY/ scale) / 2 * scale
+            val maxDx = (childWidth - screenWidth) / 2.0f
+            var maxDy = (childHeight - screenHeight) / 2.0f
+            if(maxDy < 0) maxDy = 0.0f
+
+            dx = Math.min(Math.max(dx, -maxDx - 100), maxDx + 100)
+            dy = Math.min(Math.max(dy, 0.0f -300), maxDy)
 
 
-                Log.i(
-                    TAG,
-                    "Width: " + child().width + ", scale " + scale + ", dx " + dx
-                            + ", max " + maxDx
-                )
+            Log.i(
+                TAG,
+                "Width: " + child().width + ", scale " + scale + ", dx " + dx
+                        + ", max " + maxDx
+            )
 
-                Log.i(
-                    TAG,
-                    "Height: " + child().height + ", scale " + scale + ", dy " + dy
-                            + ", max " + maxDy
-                )
-                applyScaleAndTranslation()
+            Log.i(
+                TAG,
+                "Height: " + child().height + ", scale " + scale + ", dy " + dy
+                        + ", max " + maxDy
+            )
+            applyScaleAndTranslation()
             view.invalidate()
             view.performClick()
             true
@@ -143,12 +159,13 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
     }
 
     private fun child(): View {
+        if(childCount == 0) return View(context)
         return getChildAt(0)
     }
 
     companion object {
         private const val TAG = "ZoomLayout"
         private const val MIN_ZOOM = 1.0f
-        private const val MAX_ZOOM = 4.0f
+        private const val MAX_ZOOM = 1.2f
     }
 }
