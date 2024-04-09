@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.models.Movie
 
-class RecyclerViewMovieAdapter(private val fragment : Fragment, private val movies: List<Movie>): RecyclerView.Adapter<RecyclerViewMovieAdapter.ViewHolder>() {
+class RecyclerViewMovieAdapter(private val fragment : Fragment, private var movies: List<Movie>): RecyclerView.Adapter<RecyclerViewMovieAdapter.ViewHolder>() {
     lateinit var onItemClick: ((Int) -> Unit)
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
@@ -86,5 +86,10 @@ class RecyclerViewMovieAdapter(private val fragment : Fragment, private val movi
                 holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#000000"))
             }
         }
+    }
+
+    fun updateList(newList: List<Movie>){
+        movies = newList
+        notifyDataSetChanged()
     }
 }
