@@ -18,12 +18,33 @@ import com.example.mad_21ktpm1_group11.models.Movie
 
 class RecyclerViewFoodAdapter(private val fragment : Fragment, private val foods: List<Food>): RecyclerView.Adapter<RecyclerViewFoodAdapter.ViewHolder>()
 {
+    lateinit var onFoodAdd: ((Int) -> Unit)
+    lateinit var onFoodRemove: ((Int) -> Unit)
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
         val imagePoster = view.findViewById<ImageView>(R.id.imagePoster);
         val textFoodName = view.findViewById<TextView>(R.id.textFoodName);
         val textFoodDescription = view.findViewById<TextView>(R.id.textFoodDescription);
         val buttonAdd = view.findViewById<Button>(R.id.btnAdd);
         val buttonMinus = view.findViewById<Button>(R.id.btnMinus);
+        val textAmount = view.findViewById<TextView>(R.id.textAmount);
+
+        init{
+            buttonAdd.setOnClickListener {
+                val currentAmount = textAmount.text.toString().toIntOrNull() ?: 0
+                val newAmount = currentAmount + 1
+                textAmount.text = newAmount.toString()
+                onFoodAdd.invoke(foods[adapterPosition].id)
+            }
+
+            buttonMinus.setOnClickListener {
+                val currentAmount = textAmount.text.toString().toIntOrNull() ?: 0
+                if (currentAmount > 0) {
+                    val newAmount = currentAmount - 1
+                    textAmount.text = newAmount.toString()
+                    onFoodRemove.invoke(foods[adapterPosition].id)
+                }
+            }
+        }
 
     }
 

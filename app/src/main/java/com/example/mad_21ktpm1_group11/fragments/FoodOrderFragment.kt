@@ -20,6 +20,8 @@ class FoodOrderFragment : Fragment() {
 
     private lateinit var foodList: ArrayList<Food>
 
+    val foodBought = hashMapOf<Int, Int>()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -52,6 +54,24 @@ class FoodOrderFragment : Fragment() {
         adapter = RecyclerViewFoodAdapter(this, foodList)
         recyclerView.adapter = adapter;
         recyclerView.layoutManager = LinearLayoutManager(context)
+
+        adapter.onFoodAdd = { foodId ->
+            {
+                if(!foodBought.containsKey(foodId)){
+                    foodBought[foodId] = 1;
+                }else{
+                    foodBought[foodId] = foodBought[foodId]!! + 1;
+                }
+            }
+        }
+
+        adapter.onFoodRemove = { foodId ->
+            {
+                if(foodBought.containsKey(foodId)){
+                    foodBought[foodId] = foodBought[foodId]!! - 1;
+                }
+            }
+        }
     }
 
 }
