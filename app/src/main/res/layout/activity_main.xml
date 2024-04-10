@@ -68,19 +68,36 @@
             app:layout_constraintBottom_toBottomOf="@id/user_avatar_placeholder"/>
 
         <TextView
-            android:id="@+id/user_name"
+            android:id="@+id/login_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:text="Trần Hoàng Lâm"
-            android:textAlignment="center"
+            android:text="Login/Register"
             android:textColor="#d8d8d8"
             android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/user_avatar_placeholder" />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Username"
+            android:textAlignment="center"
+            android:textColor="#d8d8d8"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/login_btn" />
 
         <TextView
             android:id="@+id/member_code"

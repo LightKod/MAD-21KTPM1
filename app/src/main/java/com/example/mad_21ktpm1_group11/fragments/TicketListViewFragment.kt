@@ -11,8 +11,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewTicketAdapter
+import com.example.mad_21ktpm1_group11.decorators.SpacingItemDecorator
+import com.example.mad_21ktpm1_group11.decorators.VerticalSpacingItemDecorator
 import com.example.mad_21ktpm1_group11.models.Ticket
 
 class TicketListViewFragment : Fragment() {
@@ -64,12 +67,11 @@ class TicketListViewFragment : Fragment() {
         recyclerViewAdapter = RecyclerViewTicketAdapter(this, ticketList)
         recyclerView.adapter = recyclerViewAdapter
         recyclerView.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
-        val dividerItemDecoration: DividerItemDecoration = DividerItemDecoration(recyclerView.context, LinearLayoutManager.VERTICAL)
-        dividerItemDecoration.setDrawable(ContextCompat.getDrawable(this.requireContext(), R.drawable.item_divider)!!)
-        recyclerView.addItemDecoration(dividerItemDecoration)
+        recyclerView.addItemDecoration(VerticalSpacingItemDecorator(this.requireContext(), 24))
 
         recyclerViewAdapter.onItemClick = {id ->
             Toast.makeText(this.requireContext(), "Clicked item: $id", Toast.LENGTH_SHORT).show()
+            (this.activity as? MainActivity)?.addFragment(TicketDetailFragment(), "ticket_detail")
         }
 
         return view

@@ -115,6 +115,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
+                    android:fontFamily="sans-serif-medium"
                     android:text="Showing"
                     android:textColor="@color/white"
                     android:textStyle="bold"
@@ -147,6 +148,7 @@
                     android:textAllCaps="true"
                     android:textColor="@color/white"
                     android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium"
                     app:layout_constrainedWidth="true"
                     app:layout_constraintHorizontal_chainStyle="packed"
                     app:layout_constraintRight_toLeftOf="@+id/movieClassification"
@@ -202,6 +204,7 @@
                     android:text="BOOK TICKET"
                     android:textColor="@color/white"
                     android:textSize="10sp"
+                    android:fontFamily="sans-serif-medium"
                     app:layout_constraintBottom_toBottomOf="@+id/textViewMovieInfo"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/textViewMovieName" />

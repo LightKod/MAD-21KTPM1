@@ -3,6 +3,9 @@ package com.example.mad_21ktpm1_group11.fragments
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -35,6 +38,7 @@ import kotlin.math.abs
 class HomeFragment : Fragment() {
     private lateinit var menuBtn: ImageButton
     private lateinit var ticketBtn: ImageButton
+    private lateinit var bookBtn: Button
 
     private lateinit var imageViewDashboardBackground: ImageView
 
@@ -62,6 +66,9 @@ class HomeFragment : Fragment() {
     private lateinit var viewPagerSliderMenuAdapter: SliderMenuAdapter
 
     private lateinit var imageViewUserIcon: ImageView
+    private lateinit var searchBtn: Button
+
+    private lateinit var handler: Handler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,6 +95,7 @@ class HomeFragment : Fragment() {
 
         menuBtn = view.findViewById(R.id.menuBtn)
         ticketBtn = view.findViewById(R.id.ticketBtn)
+        bookBtn = view.findViewById(R.id.bookBtn)
 
         viewPagerAdvertisement = view.findViewById(R.id.viewPagerAdvertisement)
         viewPagerMovieList = view.findViewById(R.id.viewPagerMovieList)
@@ -137,6 +145,7 @@ class HomeFragment : Fragment() {
 
 
         imageViewUserIcon = view.findViewById(R.id.imageViewUserIcon)
+        searchBtn = view.findViewById(R.id.searchBtn)
 
         menuBtn.setOnClickListener {
             (this.activity as? MainActivity)?.openDrawer()
@@ -146,12 +155,23 @@ class HomeFragment : Fragment() {
             (this.activity as? MainActivity)?.addFragment(TicketFragment(), "ticket")
         }
 
+        bookBtn.setOnClickListener{
+            (this.activity as? MainActivity)?.addFragment(SeatSelectionFragment(), "seat")
+        }
+
         imageViewUserIcon.setOnClickListener {
             (this.activity as? MainActivity)?.addFragment(UserDashboardFragment(), "member")
         }
+
+        searchBtn.setOnClickListener {
+            (this.activity as? MainActivity)?.addFragment(MovieSearchFragment(), "search")
+        }
+
+        handler = Handler(Looper.myLooper()!!)
     }
 
     private fun initViewPagers() {
+        // MOVIE LIST VIEWPAGER
         viewPagerMovieListAdapter = ImageAdapter(this, movieImageList)
 
         viewPagerMovieList.adapter = viewPagerMovieListAdapter
@@ -161,7 +181,7 @@ class HomeFragment : Fragment() {
         viewPagerMovieList.setCurrentItem(1, false)
 
         textViewMovieName.setText(movieList[1].name)
-        textViewMovieInfo.setText(movieList[1].name)
+        textViewMovieInfo.setText(movieList[1].premiereDate)
         Glide.with(this)
             .load(movieImageList[1])
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
@@ -180,6 +200,7 @@ class HomeFragment : Fragment() {
         }
         viewPagerMovieList.setPageTransformer(movieListTransformer)
 
+        // ADVERTISEMENT VIEWPAGER
         viewPagerAdvertisementAdapter = ImageURLAdapter(this, advertisementImageList)
 
         viewPagerAdvertisement.adapter = viewPagerAdvertisementAdapter
@@ -192,6 +213,16 @@ class HomeFragment : Fragment() {
         advertisementTransformer.addTransformer(MarginPageTransformer(30))
         viewPagerAdvertisement.setPageTransformer(advertisementTransformer)
 
+        // PROMOTION VIEWPAGER
+        viewPagerPromotion.adapter = viewPagerAdvertisementAdapter
+        viewPagerPromotion.offscreenPageLimit = 2
+        viewPagerPromotion.clipToPadding = false
+        viewPagerPromotion.clipChildren = false
+        viewPagerPromotion.setCurrentItem(1, false)
+
+        viewPagerPromotion.setPageTransformer(advertisementTransformer)
+
+        // SLIDER MENU VIEWPAGER
         viewPagerSliderMenuAdapter = SliderMenuAdapter(childFragmentManager, lifecycle)
 
         viewPagerSliderMenuAdapter.addFragment(SliderMenuFirstFragment())
@@ -214,6 +245,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun handleViewPagerEvents() {
+        // MOVIE LIST VIEWPAGER
         viewPagerMovieList.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -232,8 +264,10 @@ class HomeFragment : Fragment() {
 
         viewPagerMovieListAdapter.onItemClick = { name ->
             Toast.makeText(context, "Item clicked: " + name, Toast.LENGTH_SHORT).show()
+            (this.activity as? MainActivity)?.addFragment(MovieDetailFragment(), "movie_detail")
         }
 
+        // SLIDER MENU VIEWPAGER
         viewPagerSliderMenu.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 dotsImage.mapIndexed{ index, imageView ->
@@ -250,6 +284,15 @@ class HomeFragment : Fragment() {
 
         addInfiniteScroll(viewPagerMovieList)
         addInfiniteScroll(viewPagerAdvertisement)
+
+        // ADVERTISEMENT VIEWPAGER
+        viewPagerAdvertisement.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                handler.removeCallbacks(runnable)
+                handler.postDelayed(runnable, 5000)
+            }
+        })
     }
 
     private fun setMovieClassification(item: Movie){
@@ -312,5 +355,19 @@ class HomeFragment : Fragment() {
         recyclerViewNews.adapter = recyclerViewNewsAdapter
         recyclerViewNews.layoutManager = LinearLayoutManager(this.context, LinearLayoutManager.HORIZONTAL, false)
         recyclerViewNews.addItemDecoration(SpacingItemDecorator(this.requireContext(), 50))
+    }
+
+    private val runnable = Runnable{
+        viewPagerAdvertisement.currentItem = viewPagerAdvertisement.currentItem + 1
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(runnable)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handler.postDelayed(runnable, 5000)
     }
 }

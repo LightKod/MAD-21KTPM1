@@ -29,6 +29,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
         android:maxLines="2"
         android:text="A LONG LONG LONG LONG LONG LONG LONG LONG TITLE"
         android:textColor="#424242"
