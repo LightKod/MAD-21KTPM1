@@ -18,7 +18,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.DateAdapter
-import com.example.mad_21ktpm1_group11.adapters.MarginItemDecoration
 import com.example.mad_21ktpm1_group11.adapters.RecyclerCinemaScheduleAdapter
 import com.example.mad_21ktpm1_group11.models.OnDateSelectedListener
 import java.text.SimpleDateFormat
@@ -80,7 +79,7 @@ class BookingTimeFragment : Fragment(), OnDateSelectedListener {
         val recyclerViewTime: RecyclerView = view.findViewById(R.id.recycleViewCinemaSchedules)
         val cinemaList = listOf("CGV - Tân Phú", "Galaxy - Hoàng Văn Thụ", "BHD - Vincom", "Lotte - Cantavil")
 
-        val  cinemaAdapter = RecyclerCinemaScheduleAdapter(cinemaList)
+        val  cinemaAdapter = RecyclerCinemaScheduleAdapter(this,cinemaList)
         recyclerViewTime.adapter = cinemaAdapter
         recyclerViewTime.addItemDecoration(MarginItem(20))
 

@@ -1,5 +1,6 @@
 package com.example.mad_21ktpm1_group11.adapters
 
+import android.content.Context
 import android.graphics.Rect
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,19 +8,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mad_21ktpm1_group11.R
 
-class MarginItemDecoration(private val marginPx: Int) : RecyclerView.ItemDecoration() {
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-        super.getItemOffsets(outRect, view, parent, state)
-        outRect.right = marginPx // Đặt giá trị marginRight cho phần tử
-    }
-}
 
-class RecyclerCinemaScheduleAdapter(private val cinemaScheduleList: List<String>) : RecyclerView.Adapter<RecyclerCinemaScheduleAdapter.CinemaScheduleViewHolder>() {
+class RecyclerCinemaScheduleAdapter(private val fragment : Fragment, private val cinemaScheduleList: List<String>) : RecyclerView.Adapter<RecyclerCinemaScheduleAdapter.CinemaScheduleViewHolder>() {
     var isExpanded = false
+    class MarginItemDecoration(private val marginPx: Int) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+            super.getItemOffsets(outRect, view, parent, state)
+            outRect.right = marginPx // Đặt giá trị marginRight cho phần tử
+        }
+    }
 
     inner class CinemaScheduleViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textViewCinemaName: TextView = itemView.findViewById(R.id.textViewCinemaName)
@@ -62,7 +64,7 @@ class RecyclerCinemaScheduleAdapter(private val cinemaScheduleList: List<String>
             // Xử lý sự kiện khi một thời gian được chọn
 
         val showTimes = listOf("2:30", "3:40", "4:55", "6:10", "7:25") // Mảng giả lập các thời gian
-        val timeAdapter = ButtonTimeAdapter(showTimes) { selectedTime ->
+        val timeAdapter = ButtonTimeAdapter(fragment,showTimes) { selectedTime ->
             // Xử lý sự kiện khi một thời gian được chọn
             println("Selected time: $selectedTime")
         }

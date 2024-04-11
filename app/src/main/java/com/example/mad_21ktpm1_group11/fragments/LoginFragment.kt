@@ -6,7 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 
 class LoginFragment : Fragment() {
@@ -30,6 +32,10 @@ class LoginFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
         val forgotPasswordTextView = view.findViewById<TextView>(R.id.forgotPasswordTextView)
         forgotPasswordTextView.paintFlags = forgotPasswordTextView.paintFlags or Paint.UNDERLINE_TEXT_FLAG
+        val btnRegister = view.findViewById<Button>(R.id.button2)
+        btnRegister.setOnClickListener {
+            (this.activity as MainActivity).addFragment(RegisterFragment())
+        }
         return view
     }
 
