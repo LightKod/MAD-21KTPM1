@@ -16,6 +16,7 @@
     <string name="hint_ticket_code">Ticket\'s code <font color="#AD2B33">*</font></string>
     <string name="refund_text"><u>Request a refund</u></string>
     <string name="hint_voucher_code">Voucher\'s code <font color="#AD2B33">*</font></string>
+    <string name="map_api">AIzaSyBvpD7jI5CDGnf8w7_GBOPKdu026mZ-A-4</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
