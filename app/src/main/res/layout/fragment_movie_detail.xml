@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MovieDetailActivity">
+    android:background="#FFFFFF"
+    tools:context=".fragments.MovieDetailFragment">
 
     <VideoView
         android:id="@+id/videoTrailer"
@@ -23,6 +24,28 @@
         android:layout_marginTop="-80dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/videoTrailer" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buttonReview"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/heart"
+        android:backgroundTintMode="src_in"
+        app:layout_constraintStart_toStartOf="@+id/textDate"
+        app:layout_constraintTop_toBottomOf="@+id/textDate" />
+
+    <TextView
+        android:id="@+id/textMovieName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="TextView"
+        android:textColor="#FFFFFF"
+        android:textSize="24dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/videoTrailer"
+        app:layout_constraintStart_toStartOf="@+id/textDate" />
 
     <TextView
         android:id="@+id/textDate"
