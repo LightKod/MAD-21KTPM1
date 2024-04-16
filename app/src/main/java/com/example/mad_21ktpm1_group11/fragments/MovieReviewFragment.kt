@@ -9,6 +9,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Recycler
+import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewReviewListAdapter
 import com.example.mad_21ktpm1_group11.models.Review
@@ -49,9 +50,14 @@ class MovieReviewFragment : Fragment() {
             Review(10, "LoyalCustomer", 4, "Good value for money.")
         )
 
+
         adapter = RecyclerViewReviewListAdapter(this,reviewList);
         recyclerViewReviews.adapter = adapter;
         recyclerViewReviews.layoutManager = LinearLayoutManager(context)
+
+        buttonAdd.setOnClickListener {
+            (this.activity as? MainActivity)?.addFragment(NewReviewFragment(),"newReview")
+        }
     }
 
 
