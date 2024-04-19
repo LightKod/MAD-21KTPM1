@@ -24,6 +24,7 @@ import com.example.mad_21ktpm1_group11.fragments.MapFragment
 import com.example.mad_21ktpm1_group11.fragments.NewsAndPromosFragment
 import com.example.mad_21ktpm1_group11.fragments.PaymentPreviewFragment
 import com.example.mad_21ktpm1_group11.fragments.UserDashboardFragment
+import com.example.mad_21ktpm1_group11.fragments.VoucherRedeemFragment
 import jp.wasabeef.glide.transformations.BlurTransformation
 
 class MainActivity : AppCompatActivity() {
@@ -34,6 +35,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bookByMovieBtn: Button
     private lateinit var newsBtn: Button
     private lateinit var mapBtn: Button
+    private lateinit var redeemBtn: Button
 
     private lateinit var ticketBtn: Button
 
@@ -61,6 +63,7 @@ class MainActivity : AppCompatActivity() {
         bookByMovieBtn = findViewById(R.id.book_by_movie_btn)
         newsBtn = findViewById(R.id.news_btn)
         mapBtn = findViewById(R.id.map_btn)
+        redeemBtn = findViewById(R.id.redeem_btn)
 
         ticketBtn = findViewById(R.id.ticket_btn)
 
@@ -96,6 +99,10 @@ class MainActivity : AppCompatActivity() {
 
         mapBtn.setOnClickListener {
             addFragment(MapFragment(), "map")
+        }
+
+        redeemBtn.setOnClickListener {
+            addFragment(VoucherRedeemFragment(), "redeem")
         }
 
         ticketBtn.setOnClickListener {

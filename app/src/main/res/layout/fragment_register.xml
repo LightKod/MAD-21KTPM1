@@ -23,6 +23,8 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             android:scaleType="fitCenter"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
             app:layout_constraintVertical_bias="0.0"
             android:src="@drawable/logo" />
         <com.google.android.material.textfield.TextInputLayout
@@ -273,8 +275,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="60dp"
-            android:backgroundTint="#F44336"
+            android:backgroundTint="@color/red"
             android:text="Đăng ký"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
