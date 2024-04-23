@@ -29,10 +29,17 @@ import com.example.mad_21ktpm1_group11.adapters.ImageAdapter
 import com.example.mad_21ktpm1_group11.adapters.ImageURLAdapter
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewNewsAdapter
 import com.example.mad_21ktpm1_group11.adapters.SliderMenuAdapter
+import com.example.mad_21ktpm1_group11.adapters.ViewPagerMovieAdapter
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.decorators.SpacingItemDecorator
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.News
 import jp.wasabeef.glide.transformations.BlurTransformation
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.create
 import kotlin.math.abs
 
 class HomeFragment : Fragment() {
@@ -60,7 +67,7 @@ class HomeFragment : Fragment() {
     private lateinit var newsList: ArrayList<News>
     private lateinit var movieList: ArrayList<Movie>
 
-    private lateinit var viewPagerMovieListAdapter: ImageAdapter
+    private lateinit var viewPagerMovieListAdapter: ViewPagerMovieAdapter
     private lateinit var viewPagerAdvertisementAdapter: ImageURLAdapter
     private lateinit var recyclerViewNewsAdapter: RecyclerViewNewsAdapter
     private lateinit var viewPagerSliderMenuAdapter: SliderMenuAdapter
@@ -68,7 +75,7 @@ class HomeFragment : Fragment() {
     private lateinit var imageViewUserIcon: ImageView
     private lateinit var searchBtn: Button
 
-    private lateinit var handler: Handler
+    var handler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,15 +86,39 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        return inflater.inflate(R.layout.fragment_home, container, false)
+    }
 
-        init(view)
-        initViewPagers()
-        handleViewPagerEvents()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        initRecyclerViews()
+        fetchData(view)
+    }
 
-        return view
+    private fun fetchData(view: View){
+        val movieService = RetrofitClient.instance.create(MovieApi::class.java)
+        val call = movieService.getCurrentlyShowingMovies()
+
+        call.enqueue(object : Callback<List<Movie>> {
+            override fun onResponse(call: Call<List<Movie>>, response: Response<List<Movie>>) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    movieList = ArrayList(response.body()!!)
+                    init(view)
+                    initViewPagers()
+                    handleViewPagerEvents()
+                    initRecyclerViews()
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
     }
 
     private fun init(view: View){
@@ -108,25 +139,6 @@ class HomeFragment : Fragment() {
         textViewMovieName = view.findViewById(R.id.textViewMovieName)
         textViewMovieInfo = view.findViewById(R.id.textViewMovieInfo)
         movieClassification = view.findViewById(R.id.movieClassification)
-
-        movieList = ArrayList()
-        for(i in 1..10){
-            movieList.add(Movie(
-                i,
-                "Movie name $i",
-                if (i % 5 == 1) "T13" else if (i % 5 == 2) "T16" else if (i % 5 == 3) "T18" else if (i % 5 == 4) "K" else "P",
-                "01/01/2000",
-                125 + i,
-                "Meo meo",
-                ""
-            ))
-        }
-
-        movieImageList = ArrayList()
-        movieImageList.add(R.drawable.one)
-        movieImageList.add(R.drawable.two)
-        movieImageList.add(R.drawable.three)
-        movieImageList.add(R.drawable.four)
 
         advertisementImageList = ArrayList()
         advertisementImageList.add("https://iguov8nhvyobj.vcdn.cloud/media/banner/cache/1/b58515f018eb873dafa430b6f9ae0c1e/i/m/imgpsh_fullsize_anim_2.png")
@@ -172,7 +184,7 @@ class HomeFragment : Fragment() {
 
     private fun initViewPagers() {
         // MOVIE LIST VIEWPAGER
-        viewPagerMovieListAdapter = ImageAdapter(this, movieImageList)
+        viewPagerMovieListAdapter = ViewPagerMovieAdapter(this, movieList)
 
         viewPagerMovieList.adapter = viewPagerMovieListAdapter
         viewPagerMovieList.offscreenPageLimit = 2
@@ -180,10 +192,10 @@ class HomeFragment : Fragment() {
         viewPagerMovieList.clipChildren = false
         viewPagerMovieList.setCurrentItem(1, false)
 
-        textViewMovieName.setText(movieList[1].name)
-        textViewMovieInfo.setText(movieList[1].premiereDate)
+        textViewMovieName.text = movieList[1].name
+        textViewMovieInfo.text = movieList[1].premiereDate
         Glide.with(this)
-            .load(movieImageList[1])
+            .load("https://image.tmdb.org/t/p/original" + movieList[1].poster)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
             .into(imageViewDashboardBackground)
         setMovieClassification(movieList[1])
@@ -242,6 +254,8 @@ class HomeFragment : Fragment() {
             })
         }
         dotsImage[0].setImageResource(R.drawable.dot_selected)
+
+        handler?.postDelayed(runnable, 5000)
     }
 
     private fun handleViewPagerEvents() {
@@ -254,7 +268,7 @@ class HomeFragment : Fragment() {
                 textViewMovieName.text = item.name
                 textViewMovieInfo.text = item.premiereDate
                 Glide.with(this@HomeFragment)
-                    .load(movieImageList[position])
+                    .load("https://image.tmdb.org/t/p/original" + item.poster)
                     .placeholder(R.drawable.black)
                     .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
                     .into(imageViewDashboardBackground)
@@ -289,13 +303,15 @@ class HomeFragment : Fragment() {
         viewPagerAdvertisement.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback(){
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                handler.removeCallbacks(runnable)
-                handler.postDelayed(runnable, 5000)
+                handler?.removeCallbacks(runnable)
+                handler?.postDelayed(runnable, 5000)
             }
         })
     }
 
     private fun setMovieClassification(item: Movie){
+        if(item.classification == null)
+            return
         when(item.classification){
             "P" -> {
                 movieClassification.text = "P"
@@ -363,11 +379,11 @@ class HomeFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        handler.removeCallbacks(runnable)
+        handler?.removeCallbacks(runnable)
     }
 
     override fun onResume() {
         super.onResume()
-        handler.postDelayed(runnable, 5000)
+        handler?.postDelayed(runnable, 5000)
     }
 }

@@ -11,6 +11,9 @@ interface MovieApi {
     @GET("movies/{id}")
     fun getMovieByID(@Path("id") id: Int): Call<Movie>
 
+    @GET("movies")
+    fun getAllMovies(): Call<List<Movie>>
+
 //    @GET("/fact")
 //    fun getCatFact(): Call<CatFactResponse>
 }
