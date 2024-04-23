@@ -1,12 +1,10 @@
 package com.example.mad_21ktpm1_group11
 
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -15,17 +13,15 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.example.mad_21ktpm1_group11.fragments.BookByMovieFragment
 import com.example.mad_21ktpm1_group11.fragments.HomeFragment
 import com.example.mad_21ktpm1_group11.fragments.LoginFragment
 import com.example.mad_21ktpm1_group11.fragments.MapFragment
+import com.example.mad_21ktpm1_group11.fragments.MovieManagementFragment
 import com.example.mad_21ktpm1_group11.fragments.NewsAndPromosFragment
 import com.example.mad_21ktpm1_group11.fragments.PaymentPreviewFragment
 import com.example.mad_21ktpm1_group11.fragments.UserDashboardFragment
 import com.example.mad_21ktpm1_group11.fragments.VoucherRedeemFragment
-import jp.wasabeef.glide.transformations.BlurTransformation
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -38,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var redeemBtn: Button
 
     private lateinit var ticketBtn: Button
+
+    private lateinit var manageMoviesBtn: Button
 
     var isLoggedIn: Boolean = true
     private lateinit var loginBtn: TextView
@@ -66,6 +64,8 @@ class MainActivity : AppCompatActivity() {
         redeemBtn = findViewById(R.id.redeem_btn)
 
         ticketBtn = findViewById(R.id.ticket_btn)
+
+        manageMoviesBtn = findViewById(R.id.manage_movies_btn)
 
         loginBtn = findViewById(R.id.login_btn)
         userName = findViewById(R.id.user_name)
@@ -107,6 +107,10 @@ class MainActivity : AppCompatActivity() {
 
         ticketBtn.setOnClickListener {
             addFragment(PaymentPreviewFragment(), "payment")
+        }
+
+        manageMoviesBtn.setOnClickListener {
+            addFragment(MovieManagementFragment(), "movie_management")
         }
 
         loginBtn.setOnClickListener {
