@@ -41,7 +41,7 @@ class MovieDetailFragment : Fragment() {
     private lateinit var textTime: TextView
     private lateinit var textDescription: TextView
 
-    private val movieID = 438631
+    private var movieID = 438631
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,6 +50,11 @@ class MovieDetailFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_movie_detail, container, false)
+
+        arguments?.takeIf { it.containsKey("id") }?.apply {
+            movieID = getInt("id")
+        }
+
         fetchData()
         init()
         return  root

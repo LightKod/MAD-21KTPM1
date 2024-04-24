@@ -49,41 +49,43 @@ class RecyclerViewMovieAdapter(private val fragment : Fragment, private var movi
         val item: Movie = movies[position]
         holder.textViewMovieName.text = item.name
         holder.textViewMovieDirector.text = item.director
-        holder.textViewMoviePremiereDate.text = item.premiereDate
+        holder.textViewMoviePremiereDate.text = item.premiereDate.split("T")[0]
         val durationString = item.duration.toString() + " min"
         holder.textViewMovieDuration.text = durationString
-        Glide.with(fragment).load(item.poster).into(holder.moviePoster)
+        Glide.with(fragment).load("https://image.tmdb.org/t/p/original" + item.poster).into(holder.moviePoster)
 
-        when(item.classification){
-            "P" -> {
-                holder.movieClassification.text = "P"
-                holder.movieClassification.setTextColor(Color.parseColor("#799D46"))
-                holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#799D46"))
-            }
-            "K" -> {
-                holder.movieClassification.text = "K"
-                holder.movieClassification.setTextColor(Color.parseColor("#1A9ABD"))
-                holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#1A9ABD"))
-            }
-            "T13" -> {
-                holder.movieClassification.text = "T13"
-                holder.movieClassification.setTextColor(Color.parseColor("#E8E10A"))
-                holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E8E10A"))
-            }
-            "T16" -> {
-                holder.movieClassification.text = "T16"
-                holder.movieClassification.setTextColor(Color.parseColor("#F3A001"))
-                holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F3A001"))
-            }
-            "T18" -> {
-                holder.movieClassification.text = "T18"
-                holder.movieClassification.setTextColor(Color.parseColor("#EA3B24"))
-                holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#EA3B24"))
-            }
-            else -> {
-                holder.movieClassification.text = "U"
-                holder.movieClassification.setTextColor(Color.parseColor("#000000"))
-                holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#000000"))
+        if(item.classification != null){
+            when(item.classification){
+                "P" -> {
+                    holder.movieClassification.text = "P"
+                    holder.movieClassification.setTextColor(Color.parseColor("#799D46"))
+                    holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#799D46"))
+                }
+                "K" -> {
+                    holder.movieClassification.text = "K"
+                    holder.movieClassification.setTextColor(Color.parseColor("#1A9ABD"))
+                    holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#1A9ABD"))
+                }
+                "T13" -> {
+                    holder.movieClassification.text = "T13"
+                    holder.movieClassification.setTextColor(Color.parseColor("#E8E10A"))
+                    holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#E8E10A"))
+                }
+                "T16" -> {
+                    holder.movieClassification.text = "T16"
+                    holder.movieClassification.setTextColor(Color.parseColor("#F3A001"))
+                    holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#F3A001"))
+                }
+                "T18" -> {
+                    holder.movieClassification.text = "T18"
+                    holder.movieClassification.setTextColor(Color.parseColor("#EA3B24"))
+                    holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#EA3B24"))
+                }
+                else -> {
+                    holder.movieClassification.text = "U"
+                    holder.movieClassification.setTextColor(Color.parseColor("#000000"))
+                    holder.movieClassification.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#000000"))
+                }
             }
         }
     }

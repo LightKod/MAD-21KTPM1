@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,11 +29,19 @@ import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Person
 import com.google.android.material.textfield.TextInputLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MovieManagementDetailFragment : Fragment() {
+    private lateinit var mode: String
+    private var id: Int = 0
+
     private lateinit var backBtn: ImageButton
     private lateinit var menuBtn: ImageButton
 
@@ -77,10 +86,15 @@ class MovieManagementDetailFragment : Fragment() {
         init(view)
 
         arguments?.takeIf { it.containsKey("type") }?.apply {
-            if(getString("type") == "edit"){
+            mode = getString("type")!!
+            if(mode == "edit"){
                 textViewHeaderTitle.text = "Update a movie"
                 saveBtn.text = "Update"
                 deleteBtn.visibility = View.VISIBLE
+
+                id = getInt("id")
+                Log.i("meo", "$id")
+                fetchData()
             }
             else{
                 textViewHeaderTitle.text = "Add a new movie"
@@ -88,6 +102,29 @@ class MovieManagementDetailFragment : Fragment() {
                 deleteBtn.visibility = View.GONE
             }
         }
+    }
+
+    private fun fetchData(){
+        val movieService = RetrofitClient.instance.create(MovieApi::class.java)
+        val call = movieService.getMovieByID(id)
+
+        call.enqueue(object : Callback<Movie> {
+            override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    movie = response.body()!!
+                    setData()
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<Movie>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
     }
 
     private fun init(view: View){
@@ -384,5 +421,14 @@ class MovieManagementDetailFragment : Fragment() {
                 imageViewMoviePosterPreview.visibility = View.VISIBLE
             }
         }
+    }
+
+    private fun setData(){
+        Glide.with(this.requireContext()).load("https://image.tmdb.org/t/p/original" + movie.poster).into(imageViewMoviePosterPreview)
+        if(imageViewMoviePosterPreview.visibility == View.GONE){
+            imageViewMoviePosterPreview.visibility = View.VISIBLE
+        }
+        editTextMovieName.setText(movie.name)
+        editTextMovieDuration.setText(movie.duration.toString())
     }
 }

@@ -93,6 +93,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         fetchData(view)
+        init(view)
     }
 
     private fun fetchData(view: View){
@@ -104,7 +105,6 @@ class HomeFragment : Fragment() {
                 if (response.isSuccessful) {
                     // Handle successful response
                     movieList = ArrayList(response.body()!!)
-                    init(view)
                     initViewPagers()
                     handleViewPagerEvents()
                     initRecyclerViews()
@@ -193,7 +193,7 @@ class HomeFragment : Fragment() {
         viewPagerMovieList.setCurrentItem(1, false)
 
         textViewMovieName.text = movieList[1].name
-        textViewMovieInfo.text = movieList[1].premiereDate
+        textViewMovieInfo.text = movieList[1].premiereDate.split("T")[0]
         Glide.with(this)
             .load("https://image.tmdb.org/t/p/original" + movieList[1].poster)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
@@ -266,7 +266,7 @@ class HomeFragment : Fragment() {
 
                 val item = movieList[position]
                 textViewMovieName.text = item.name
-                textViewMovieInfo.text = item.premiereDate
+                textViewMovieInfo.text = item.premiereDate.split("T")[0]
                 Glide.with(this@HomeFragment)
                     .load("https://image.tmdb.org/t/p/original" + item.poster)
                     .placeholder(R.drawable.black)
@@ -276,9 +276,12 @@ class HomeFragment : Fragment() {
             }
         })
 
-        viewPagerMovieListAdapter.onItemClick = { name ->
-            Toast.makeText(context, "Item clicked: " + name, Toast.LENGTH_SHORT).show()
-            (this.activity as? MainActivity)?.addFragment(MovieDetailFragment(), "movie_detail")
+        viewPagerMovieListAdapter.onItemClick = { id ->
+            val fragment = MovieDetailFragment()
+            fragment.arguments = Bundle().apply {
+                putInt("id", id)
+            }
+            (this.activity as? MainActivity)?.addFragment(fragment, "movie_detail")
         }
 
         // SLIDER MENU VIEWPAGER

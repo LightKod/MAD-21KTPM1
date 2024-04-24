@@ -1,6 +1,7 @@
 package com.example.mad_21ktpm1_group11.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,7 +16,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewMovieAdapter
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.Movie
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class BookByMovieFragment : Fragment() {
     private lateinit var backBtn: ImageButton
@@ -34,11 +40,37 @@ class BookByMovieFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_book_by_movie, container, false)
+        return inflater.inflate(R.layout.fragment_book_by_movie, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        fetchData(view)
         init(view)
+    }
 
-        return view
+    private fun fetchData(view: View){
+        val movieService = RetrofitClient.instance.create(MovieApi::class.java)
+        val call = movieService.getCurrentlyShowingMovies()
+
+        call.enqueue(object : Callback<List<Movie>> {
+            override fun onResponse(call: Call<List<Movie>>, response: Response<List<Movie>>) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    movieList = ArrayList(response.body()!!)
+                    setData()
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
     }
 
     private fun init(view: View){
@@ -54,20 +86,9 @@ class BookByMovieFragment : Fragment() {
         }
 
         recyclerViewMovieList = view.findViewById(R.id.recyclerViewMovieList)
+    }
 
-        movieList = ArrayList()
-        for(i in 1..10){
-            movieList.add(Movie(
-                i,
-                "Movie name $i",
-                if (i % 5 == 1) "T13" else if (i % 5 == 2) "T16" else if (i % 5 == 3) "T18" else if (i % 5 == 4) "K" else "P",
-                "01/01/2000",
-                125 + i,
-                "Meo meo",
-                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMRsQpTd3EBxP_VQLMxiUiP1YtbtPGxGEWhscmTV_tCg&s"
-            ))
-        }
-
+    private fun setData(){
         recyclerViewMovieListAdapter = RecyclerViewMovieAdapter(this, movieList)
         recyclerViewMovieList.adapter = recyclerViewMovieListAdapter
         recyclerViewMovieList.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -76,7 +97,11 @@ class BookByMovieFragment : Fragment() {
         recyclerViewMovieList.addItemDecoration(dividerItemDecoration)
 
         recyclerViewMovieListAdapter.onItemClick = {id ->
-            Toast.makeText(this.requireContext(), "Clicked item: $id", Toast.LENGTH_SHORT).show()
+            val fragment = MovieDetailFragment()
+            fragment.arguments = Bundle().apply {
+                putInt("id", id)
+            }
+            (this.activity as? MainActivity)?.addFragment(fragment, "movie_detail")
         }
     }
 }
