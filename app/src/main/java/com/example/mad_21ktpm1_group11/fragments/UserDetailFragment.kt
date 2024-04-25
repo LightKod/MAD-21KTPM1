@@ -28,6 +28,8 @@ import com.example.mad_21ktpm1_group11.api.AccountApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.User
 import com.google.android.material.textfield.TextInputLayout
+import com.google.gson.JsonObject
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -347,7 +349,43 @@ class UserDetailFragment : Fragment() {
                 Toast.makeText(this.requireContext(), "You haven't filled out the form yet", Toast.LENGTH_SHORT).show()
             }
             else{
-                Toast.makeText(this.requireContext(), "It's a me Save Button!", Toast.LENGTH_SHORT).show()
+                val requestJson = JsonObject().apply {
+                    addProperty("name", editTextUserName.text.toString())
+                    addProperty("phone", editTextUserPhone.text.toString())
+                    addProperty("dob", editTextUserDOB.text.toString())
+                    addProperty("gender", editTextUserGender.text.toString())
+                    addProperty("address", editTextUserCity.text.toString())
+                }
+
+                val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                val token = sharedPref.getString("token", "") ?: ""
+
+                if (token != "") {
+                    val accountService = RetrofitClient.instance.create(AccountApi::class.java)
+                    val call = accountService.updateUserDetail(token, requestJson)
+                    call.enqueue(object : Callback<ResponseBody> {
+                        override fun onResponse(
+                            call: Call<ResponseBody>,
+                            response: Response<ResponseBody>
+                        ) {
+                            if (response.isSuccessful) {
+                                // Handle successful response
+                                Toast.makeText(requireContext(), "Successfully update your profile", Toast.LENGTH_SHORT).show()
+                                (this@UserDetailFragment.activity as? MainActivity)?.goBack()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error: ${response.code()} - ${response.errorBody()?.string()}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                            Log.i("API", t.message!!)
+                        }
+                    })
+                }
             }
         }
     }
@@ -370,6 +408,7 @@ class UserDetailFragment : Fragment() {
                         editTextUserEmail.setText(user.email)
                         editTextUserDOB.setText(user.dob)
                         editTextUserGender.setText(user.gender)
+                        editTextUserCity.setText(user.address?.get(0) ?: "")
                     } else {
                         if(response.code() == 401){
                             Toast.makeText(requireContext(), "Token expired, please log in again.", Toast.LENGTH_SHORT).show()

@@ -11,7 +11,7 @@ data class User(
     @SerializedName("phone") val phone: String?,
     @SerializedName("email") val email: String,
     val password: String?,
-    val address: List<String>?,
+    @SerializedName("address") val address: List<String>?,
     @SerializedName("dob") val dob: String?,
     @SerializedName("role") val role: String?,
     val createdAt: String?,

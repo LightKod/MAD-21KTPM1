@@ -1,8 +1,10 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +15,14 @@ import android.widget.ImageButton
 import android.widget.Toast
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.api.AccountApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.google.android.material.textfield.TextInputLayout
+import com.google.gson.JsonObject
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.regex.Pattern
 
 class ChangePasswordFragment : Fragment() {
@@ -39,11 +48,12 @@ class ChangePasswordFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_change_password, container, false)
+        return inflater.inflate(R.layout.fragment_change_password, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         init(view)
-
-        return view
     }
 
     private fun init(view: View){
@@ -151,7 +161,44 @@ class ChangePasswordFragment : Fragment() {
                 Toast.makeText(this.requireContext(), "You haven't completed the form yet", Toast.LENGTH_SHORT).show()
             }
             else{
-                Toast.makeText(this.requireContext(), "Password changed!", Toast.LENGTH_SHORT).show()
+                val requestJson = JsonObject().apply {
+                    addProperty("old_password", editTextOldPassword.text.toString())
+                    addProperty("new_password", editTextNewPassword.text.toString())
+                }
+
+                val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                val token = sharedPref.getString("token", "") ?: ""
+
+                if (token != "") {
+                    val accountService = RetrofitClient.instance.create(AccountApi::class.java)
+                    val call = accountService.changeUserPassword(token, requestJson)
+                    call.enqueue(object : Callback<ResponseBody> {
+                        override fun onResponse(
+                            call: Call<ResponseBody>,
+                            response: Response<ResponseBody>
+                        ) {
+                            if (response.isSuccessful) {
+                                // Handle successful response
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Successfully changed your password",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                (this@ChangePasswordFragment.activity as? MainActivity)?.goBack()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error: ${response.code()} - ${response.errorBody()?.string()}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+                        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                            Log.i("API", t.message!!)
+                        }
+                    })
+                }
             }
         }
     }
