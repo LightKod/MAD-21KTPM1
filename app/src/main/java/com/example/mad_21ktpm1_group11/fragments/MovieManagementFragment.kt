@@ -31,7 +31,7 @@ class MovieManagementFragment : Fragment() {
     private lateinit var recyclerViewMovieList: RecyclerView
     private lateinit var recyclerViewMovieListAdapter: RecyclerViewMovieAdapter
 
-    private lateinit var movieList: ArrayList<Movie>
+    private var movieList: ArrayList<Movie> = ArrayList()
 
     private lateinit var addMovieBtn: FloatingActionButton
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,8 +61,7 @@ class MovieManagementFragment : Fragment() {
             override fun onResponse(call: Call<List<Movie>>, response: Response<List<Movie>>) {
                 if (response.isSuccessful) {
                     // Handle successful response
-                    movieList = ArrayList(response.body()!!)
-                    setData()
+                    recyclerViewMovieListAdapter.updateList(ArrayList(response.body()!!))
                 } else {
                     val errorMessage = response.message()
                     Log.i("API", errorMessage)
@@ -99,9 +98,7 @@ class MovieManagementFragment : Fragment() {
             }
             (this.activity as? MainActivity)?.addFragment(fragment, "movie_management_detail")
         }
-    }
 
-    private fun setData(){
         recyclerViewMovieListAdapter = RecyclerViewMovieAdapter(this, movieList)
         recyclerViewMovieList.adapter = recyclerViewMovieListAdapter
         recyclerViewMovieList.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)

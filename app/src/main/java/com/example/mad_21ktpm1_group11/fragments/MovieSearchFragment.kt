@@ -1,6 +1,7 @@
 package com.example.mad_21ktpm1_group11.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +19,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewMovieAdapter
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.Movie
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MovieSearchFragment : Fragment() {
     private lateinit var backBtn: ImageButton
@@ -30,7 +36,9 @@ class MovieSearchFragment : Fragment() {
     private lateinit var recyclerViewMovieList: RecyclerView
     private lateinit var recyclerViewMovieListAdapter: RecyclerViewMovieAdapter
 
-    private lateinit var movieList: ArrayList<Movie>
+    private var movieList: ArrayList<Movie> = ArrayList()
+    private val movieService = RetrofitClient.instance.create(MovieApi::class.java)
+    private var currentlyShowing = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,11 +49,12 @@ class MovieSearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_movie_search, container, false)
+        return inflater.inflate(R.layout.fragment_movie_search, container, false)
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         init(view)
-
-        return view
     }
 
     private fun init(view: View){
@@ -65,8 +74,6 @@ class MovieSearchFragment : Fragment() {
 
         recyclerViewMovieList = view.findViewById(R.id.recyclerViewMovieList)
 
-        movieList = ArrayList()
-
         recyclerViewMovieListAdapter = RecyclerViewMovieAdapter(this, movieList)
         recyclerViewMovieList.adapter = recyclerViewMovieListAdapter
         recyclerViewMovieList.layoutManager = LinearLayoutManager(this.requireContext(), LinearLayoutManager.VERTICAL, false)
@@ -75,33 +82,46 @@ class MovieSearchFragment : Fragment() {
         recyclerViewMovieList.addItemDecoration(dividerItemDecoration)
 
         recyclerViewMovieListAdapter.onItemClick = {id ->
-            Toast.makeText(this.requireContext(), "Clicked item: $id", Toast.LENGTH_SHORT).show()
+            val fragment = MovieDetailFragment()
+            fragment.arguments = Bundle().apply {
+                putInt("id", id)
+            }
+            (this.activity as? MainActivity)?.addFragment(fragment, "movie_detail")
         }
 
         // Search operation
         editTextSearchQuery.setOnEditorActionListener { v, actionId, event ->
             if(actionId == EditorInfo.IME_ACTION_SEARCH && !editTextSearchQuery.text.isEmpty()){
-                val newMovieList: ArrayList<Movie> = ArrayList()
-                for(i in 1..10){
-                    newMovieList.add(Movie(
-                        i,
-                        if(i % 2 == 0) "Meo meo $i" else "Woof woof $i",
-                        if (i % 5 == 1) "T13" else if (i % 5 == 2) "T16" else if (i % 5 == 3) "T18" else if (i % 5 == 4) "K" else "P",
-                        "01/01/2000",
-                        125 + i,
-                        "Meo meo",
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMRsQpTd3EBxP_VQLMxiUiP1YtbtPGxGEWhscmTV_tCg&s"
-                    ))
-                }
-
-                val filteredList = newMovieList.filter { movie ->
-                    movie.name.contains(editTextSearchQuery.text.toString() ,ignoreCase = true)
-                }
-
-                recyclerViewMovieListAdapter.updateList(filteredList)
-                recyclerViewMovieList.scrollToPosition(0)
+                fetchData()
             }
             true
         }
+
+        toggleButtonFilter.setOnCheckedChangeListener { buttonView, isChecked ->
+            currentlyShowing = isChecked
+            fetchData()
+        }
+    }
+
+    private fun fetchData(){
+        val call = movieService.getMoviesByName(editTextSearchQuery.text.toString(), currentlyShowing)
+
+        call.enqueue(object : Callback<List<Movie>> {
+            override fun onResponse(call: Call<List<Movie>>, response: Response<List<Movie>>) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    recyclerViewMovieListAdapter.updateList(ArrayList(response.body()!!))
+                    recyclerViewMovieList.scrollToPosition(0)
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
     }
 }
