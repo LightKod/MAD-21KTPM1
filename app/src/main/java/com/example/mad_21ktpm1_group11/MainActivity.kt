@@ -160,6 +160,7 @@ class MainActivity : AppCompatActivity() {
             editor.remove("token")
             editor.apply()
             toggleNavbarUser()
+            addFragment(HomeFragment(), "home")
         }
     }
 
