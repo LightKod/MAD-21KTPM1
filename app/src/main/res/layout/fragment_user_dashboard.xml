@@ -106,7 +106,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:scaleType="centerCrop"
-                            android:src="@drawable/card_after_training" />
+                            android:src="@drawable/avatar_placeholder" />
 
                     </androidx.cardview.widget.CardView>
 
@@ -127,8 +127,10 @@
 
                     <LinearLayout
                         android:id="@+id/linearLayout"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
                         android:gravity="center"
                         android:orientation="horizontal"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -150,6 +152,8 @@
                             android:id="@+id/textViewUserID"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:ellipsize="middle"
+                            android:maxLines="1"
                             android:text="0123456789JQKA"
                             android:textColor="@color/black"
                             android:textSize="20sp"

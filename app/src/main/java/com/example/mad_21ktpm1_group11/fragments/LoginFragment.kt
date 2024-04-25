@@ -1,5 +1,6 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.Context
 import android.graphics.Paint
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.api.AuthService
@@ -50,19 +52,29 @@ class LoginFragment : Fragment() {
                     if (!token.isNullOrEmpty()) {
                         // Token đã được nhận về thành công
                         Log.d("Login", "Received token: $token")
+
                         // Thực hiện các hành động tiếp theo sau khi đăng nhập thành công
+                        val sharedPref = this@LoginFragment.requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+                        val editor = sharedPref.edit()
+                        editor.putString("token", "Bearer $token")
+                        editor.apply()
+
+                        (this@LoginFragment.activity as? MainActivity)?.toggleNavbarUser()
+                        (this@LoginFragment.activity as? MainActivity)?.addFragment(HomeFragment(), "home")
                     } else {
                         Log.e("Login", "Token is null or empty")
                     }
                 } else {
                     // Xử lý khi có lỗi từ server
-                    Log.e("Login", "Error: ${response.code()} - ${response.message()}")
+                    // Log.e("Login", "Error: ${response.code()} - ${response.message()}")
+                    Toast.makeText(requireContext(), "Error: ${response.code()} - ${ response.errorBody()?.string() }", Toast.LENGTH_SHORT).show()
                 }
             }
 
             override fun onFailure(call: Call<AuthResponse>, t: Throwable) {
                 // Xử lý khi gặp lỗi kết nối
-                Log.e("Login", "Failed to connect: ${t.message}")
+                // Log.e("Login", "Failed to connect: ${t.message}")
+                Toast.makeText(requireContext(), "Error: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }

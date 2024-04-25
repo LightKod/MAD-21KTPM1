@@ -1,17 +1,19 @@
 package com.example.mad_21ktpm1_group11.models
 
+import com.google.gson.annotations.SerializedName
+
 data class User(
-    val id: String,
+    @SerializedName("id") val id: String,
     val googleId: String?,
-    val name: String?,
+    @SerializedName("name") val name: String?,
     val avatar: String?,
-    val gender: String?,
-    val phone: String?,
-    val email: String,
+    @SerializedName("gender") val gender: String?,
+    @SerializedName("phone") val phone: String?,
+    @SerializedName("email") val email: String,
     val password: String?,
     val address: List<String>?,
-    val dob: String?,
-    val role: String?,
+    @SerializedName("dob") val dob: String?,
+    @SerializedName("role") val role: String?,
     val createdAt: String?,
     val isBanned: Boolean?,
     val emailVerified: Boolean?,

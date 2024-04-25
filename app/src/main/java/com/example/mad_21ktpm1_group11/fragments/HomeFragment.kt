@@ -1,5 +1,6 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
@@ -172,7 +173,15 @@ class HomeFragment : Fragment() {
         }
 
         imageViewUserIcon.setOnClickListener {
-            (this.activity as? MainActivity)?.addFragment(UserDashboardFragment(), "member")
+            val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val token = sharedPref.getString("token", "") ?: ""
+            if (token == "") {
+                Toast.makeText(requireContext(), "You need to log in to use this feature!", Toast.LENGTH_SHORT).show()
+                (this.activity as? MainActivity)?.addFragment(LoginFragment(), "login")
+            }
+            else {
+                (this.activity as? MainActivity)?.addFragment(UserDashboardFragment(), "member")
+            }
         }
 
         searchBtn.setOnClickListener {

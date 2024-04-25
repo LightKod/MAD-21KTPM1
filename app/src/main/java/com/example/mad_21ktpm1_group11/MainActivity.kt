@@ -1,11 +1,13 @@
 package com.example.mad_21ktpm1_group11
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.view.GravityCompat
@@ -13,6 +15,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import com.example.mad_21ktpm1_group11.api.AccountApi
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.fragments.BookByMovieFragment
 import com.example.mad_21ktpm1_group11.fragments.HomeFragment
 import com.example.mad_21ktpm1_group11.fragments.LoginFragment
@@ -22,6 +27,11 @@ import com.example.mad_21ktpm1_group11.fragments.NewsAndPromosFragment
 import com.example.mad_21ktpm1_group11.fragments.PaymentPreviewFragment
 import com.example.mad_21ktpm1_group11.fragments.UserDashboardFragment
 import com.example.mad_21ktpm1_group11.fragments.VoucherRedeemFragment
+import com.example.mad_21ktpm1_group11.models.Movie
+import com.example.mad_21ktpm1_group11.models.User
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -35,9 +45,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var ticketBtn: Button
 
+    private lateinit var manageScheduleBtn: Button
     private lateinit var manageMoviesBtn: Button
 
     var isLoggedIn: Boolean = true
+    var isAdmin: Boolean = true
     private lateinit var loginBtn: TextView
     private lateinit var userName: TextView
     private lateinit var memberCode: TextView
@@ -65,6 +77,7 @@ class MainActivity : AppCompatActivity() {
 
         ticketBtn = findViewById(R.id.ticket_btn)
 
+        manageScheduleBtn = findViewById(R.id.manage_schedule_btn)
         manageMoviesBtn = findViewById(R.id.manage_movies_btn)
 
         loginBtn = findViewById(R.id.login_btn)
@@ -86,7 +99,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         memberBtn.setOnClickListener {
-            addFragment(UserDashboardFragment(), "member")
+            val sharedPref = getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val token = sharedPref.getString("token", "") ?: ""
+            if (token == "") {
+                Toast.makeText(applicationContext, "You need to log in to use this feature!", Toast.LENGTH_SHORT).show()
+                addFragment(LoginFragment(), "login")
+            }
+            else {
+                addFragment(UserDashboardFragment(), "member")
+            }
         }
 
         bookByMovieBtn.setOnClickListener {
@@ -102,11 +123,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         redeemBtn.setOnClickListener {
-            addFragment(VoucherRedeemFragment(), "redeem")
+            val sharedPref = getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val token = sharedPref.getString("token", "") ?: ""
+            if (token == "") {
+                Toast.makeText(applicationContext, "You need to log in to use this feature!", Toast.LENGTH_SHORT).show()
+                addFragment(LoginFragment(), "login")
+            }
+            else {
+                addFragment(VoucherRedeemFragment(), "redeem")
+            }
         }
 
         ticketBtn.setOnClickListener {
-            addFragment(PaymentPreviewFragment(), "payment")
+            val sharedPref = getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val token = sharedPref.getString("token", "") ?: ""
+            if (token == "") {
+                Toast.makeText(applicationContext, "You need to log in to use this feature!", Toast.LENGTH_SHORT).show()
+                addFragment(LoginFragment(), "login")
+            }
+            else {
+                addFragment(PaymentPreviewFragment(), "payment")
+            }
         }
 
         manageMoviesBtn.setOnClickListener {
@@ -118,7 +155,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         logoutBtn.setOnClickListener {
-            isLoggedIn = false
+            val sharedPref = getSharedPreferences("auth", Context.MODE_PRIVATE)
+            val editor = sharedPref.edit()
+            editor.remove("token")
+            editor.apply()
             toggleNavbarUser()
         }
     }
@@ -200,10 +240,43 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun toggleNavbarUser(){
+        val sharedPref = getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+        isLoggedIn = token != ""
+
+        if(token != ""){
+            val accountService = RetrofitClient.instance.create(AccountApi::class.java)
+            val call = accountService.getUserDetail(token)
+            call.enqueue(object : Callback<User> {
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    if (response.isSuccessful) {
+                        // Handle successful response
+                        val user = response.body()!!
+                        userName.text = user.name
+                        // isAdmin = user.role == "admin"
+                    } else {
+                        if(response.code() == 401){
+                            Toast.makeText(this@MainActivity.applicationContext, "Token expired, please log in again.", Toast.LENGTH_SHORT).show()
+                            val editor = sharedPref.edit()
+                            editor.remove("token")
+                            editor.apply()
+                            addFragment(LoginFragment(), "login")
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    Log.i("API", t.message!!)
+                }
+            })
+        }
+
         loginBtn.visibility = if(isLoggedIn) View.GONE else View.VISIBLE
         userName.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
         memberCode.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
         userCode.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
         logoutBtn.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
+        manageScheduleBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
+        manageMoviesBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
     }
 }

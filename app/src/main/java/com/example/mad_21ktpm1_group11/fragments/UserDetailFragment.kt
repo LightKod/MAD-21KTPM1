@@ -2,11 +2,13 @@ package com.example.mad_21ktpm1_group11.fragments
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.res.ColorStateList
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +24,13 @@ import androidx.core.widget.CompoundButtonCompat
 import androidx.fragment.app.Fragment
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.api.AccountApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
+import com.example.mad_21ktpm1_group11.models.User
 import com.google.android.material.textfield.TextInputLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.regex.Pattern
 
 
@@ -46,13 +54,6 @@ class UserDetailFragment : Fragment() {
 
     private lateinit var saveBtn: Button
 
-    private val dummyUserName: String = "Nguyễn Văn A"
-    private val dummyUserPhone: String = "0123456789"
-    private val dummyUserEmail: String = "mail@mail.com"
-    private val dummyUserDOB: String = "01/01/2000"
-    private val dummyUserGender: String = "Male"
-    private val dummyUserCity: String = "Hồ Chí Minh"
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -62,11 +63,14 @@ class UserDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_user_detail, container, false)
+        return inflater.inflate(R.layout.fragment_user_detail, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         init(view)
-
-        return view
+        fetchData()
     }
 
     private fun init(view: View){
@@ -96,13 +100,6 @@ class UserDetailFragment : Fragment() {
         editTextUserCity = view.findViewById(R.id.editTextUserCity)
 
         saveBtn = view.findViewById(R.id.saveBtn)
-
-        editTextUserName.setText(dummyUserName)
-        editTextUserPhone.setText(dummyUserPhone)
-        editTextUserEmail.setText(dummyUserEmail)
-        editTextUserDOB.setText(dummyUserDOB)
-        editTextUserGender.setText(dummyUserGender)
-        editTextUserCity.setText(dummyUserCity)
 
         editTextUserName.addTextChangedListener(object: TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -352,6 +349,42 @@ class UserDetailFragment : Fragment() {
             else{
                 Toast.makeText(this.requireContext(), "It's a me Save Button!", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun fetchData(){
+        val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+
+        if (token != "") {
+            val accountService = RetrofitClient.instance.create(AccountApi::class.java)
+            val call = accountService.getUserDetail(token)
+            call.enqueue(object : Callback<User> {
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    if (response.isSuccessful) {
+                        // Handle successful response
+                        val user = response.body()!!
+
+                        editTextUserName.setText(user.name)
+                        editTextUserPhone.setText(user.phone)
+                        editTextUserEmail.setText(user.email)
+                        editTextUserDOB.setText(user.dob)
+                        editTextUserGender.setText(user.gender)
+                    } else {
+                        if(response.code() == 401){
+                            Toast.makeText(requireContext(), "Token expired, please log in again.", Toast.LENGTH_SHORT).show()
+                            val editor = sharedPref.edit()
+                            editor.remove("token")
+                            editor.apply()
+                            (this@UserDetailFragment.activity as? MainActivity)?.addFragment(LoginFragment(), "login")
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    Log.i("API", t.message!!)
+                }
+            })
         }
     }
 }

@@ -1,18 +1,31 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.api.AccountApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
+import com.example.mad_21ktpm1_group11.models.User
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class UserDashboardFragment : Fragment() {
     private lateinit var backBtn: ImageButton
     private lateinit var menuBtn: ImageButton
+
+    private lateinit var textViewUserName: TextView
+    private lateinit var textViewUserID: TextView
 
     private lateinit var accountDetailBtn: Button
     private lateinit var accountPasswordBtn: Button
@@ -26,11 +39,14 @@ class UserDashboardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_user_dashboard, container, false)
+        return inflater.inflate(R.layout.fragment_user_dashboard, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         init(view)
-
-        return view
+        fetchData()
     }
 
     fun init(view: View){
@@ -45,6 +61,9 @@ class UserDashboardFragment : Fragment() {
             (this.activity as? MainActivity)?.openDrawer()
         }
 
+        textViewUserName = view.findViewById(R.id.textViewUserName)
+        textViewUserID = view.findViewById(R.id.textViewUserID)
+
         accountDetailBtn = view.findViewById(R.id.accountDetailBtn)
 
         accountDetailBtn.setOnClickListener {
@@ -55,6 +74,38 @@ class UserDashboardFragment : Fragment() {
 
         accountPasswordBtn.setOnClickListener {
             (this.activity as? MainActivity)?.addFragment(ChangePasswordFragment(), "user_password")
+        }
+    }
+
+    private fun fetchData(){
+        val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+
+        if (token != "") {
+            val accountService = RetrofitClient.instance.create(AccountApi::class.java)
+            val call = accountService.getUserDetail(token)
+            call.enqueue(object : Callback<User> {
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    if (response.isSuccessful) {
+                        // Handle successful response
+                        val user = response.body()!!
+                        textViewUserName.text = user.name
+                        textViewUserID.text = user.id
+                    } else {
+                        if(response.code() == 401){
+                            Toast.makeText(requireContext(), "Token expired, please log in again.", Toast.LENGTH_SHORT).show()
+                            val editor = sharedPref.edit()
+                            editor.remove("token")
+                            editor.apply()
+                            (this@UserDashboardFragment.activity as? MainActivity)?.addFragment(LoginFragment(), "login")
+                        }
+                    }
+                }
+
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    Log.i("API", t.message!!)
+                }
+            })
         }
     }
 }
