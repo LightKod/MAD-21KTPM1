@@ -122,6 +122,8 @@
                                 android:id="@+id/textView1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:layout_marginEnd="4dp"
                                 android:text="Add movie's poster image"
                                 android:textAlignment="center"
                                 android:textColor="@color/white"
@@ -153,7 +155,7 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="16dp"
-                        android:hint="Movie name"
+                        android:hint="Name"
                         android:textColorHint="@color/greytext"
                         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
                         app:boxBackgroundColor="@color/white"
@@ -189,7 +191,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="8dp"
-                        android:hint="Movie duration"
+                        android:hint="Duration"
                         android:textColorHint="@color/greytext"
                         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
                         app:boxBackgroundColor="@color/white"
@@ -225,7 +227,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
                         android:layout_marginEnd="16dp"
-                        android:hint="Movie rating"
+                        android:hint="Rating"
                         android:textColorHint="@color/greytext"
                         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
                         app:boxBackgroundColor="@color/white"
@@ -256,12 +258,51 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/inputLayoutMovieClassification"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:hint="Classification"
+                        android:textColorHint="@color/greytext"
+                        android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
+                        app:boxBackgroundColor="@color/white"
+                        app:boxBackgroundMode="filled"
+                        app:boxCollapsedPaddingTop="8dp"
+                        app:boxStrokeColor="@color/black"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:cursorColor="@color/black"
+                        app:cursorErrorColor="@color/red"
+                        app:endIconDrawable="@drawable/drop_down"
+                        app:endIconMode="custom"
+                        app:endIconTint="@color/greytext"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:hintTextColor="@color/black"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/inputLayoutMovieDuration">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextMovieClassification"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="false"
+                            android:inputType="none"
+                            android:paddingTop="25dp"
+                            android:paddingBottom="8dp"
+                            android:singleLine="true"
+                            android:textColor="@color/black" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/inputLayoutMovieBanner"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:hint="Movie banner"
+                        android:hint="Banner"
                         android:textColorHint="@color/greytext"
                         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
                         app:boxBackgroundColor="@color/white"
@@ -278,7 +319,7 @@
                         app:hintTextColor="@color/black"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/inputLayoutMovieDuration">
+                        app:layout_constraintTop_toBottomOf="@id/inputLayoutMovieClassification">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextMovieBanner"
@@ -297,7 +338,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:hint="Movie genres"
+                        android:hint="Genres"
                         android:textColorHint="@color/greytext"
                         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
                         app:boxBackgroundColor="@color/white"
@@ -336,7 +377,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:hint="Movie director"
+                        android:hint="Director"
                         android:textColorHint="@color/greytext"
                         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
                         app:boxBackgroundColor="@color/white"
@@ -375,7 +416,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:hint="Movie actors"
+                        android:hint="Actors"
                         android:textColorHint="@color/greytext"
                         android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
                         app:boxBackgroundColor="@color/white"
@@ -408,6 +449,41 @@
                             android:textColor="@color/black" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/inputLayoutMovieOverview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:hint="Overview"
+                        android:textColorHint="@color/greytext"
+                        android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Filled"
+                        app:boxBackgroundColor="@color/white"
+                        app:boxBackgroundMode="filled"
+                        app:boxCollapsedPaddingTop="8dp"
+                        app:boxStrokeColor="@color/black"
+                        app:boxStrokeErrorColor="@color/red"
+                        app:cursorColor="@color/black"
+                        app:cursorErrorColor="@color/red"
+                        app:endIconMode="clear_text"
+                        app:endIconTint="@color/greytext"
+                        app:errorIconTint="@color/red"
+                        app:errorTextColor="@color/red"
+                        app:hintTextColor="@color/black"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/inputLayoutMovieActors">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextMovieOverview"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text|textMultiLine"
+                            android:paddingTop="25dp"
+                            android:paddingBottom="8dp"
+                            android:textColor="@color/black" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
                     <Button
                         android:id="@+id/saveBtn"
                         android:layout_width="0dp"
@@ -424,7 +500,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/inputLayoutMovieActors" />
+                        app:layout_constraintTop_toBottomOf="@+id/inputLayoutMovieOverview" />
 
                     <Button
                         android:id="@+id/deleteBtn"

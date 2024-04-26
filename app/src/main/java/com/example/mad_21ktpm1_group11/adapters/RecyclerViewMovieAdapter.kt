@@ -48,7 +48,7 @@ class RecyclerViewMovieAdapter(private val fragment : Fragment, private var movi
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item: Movie = movies[position]
         holder.textViewMovieName.text = item.name
-        holder.textViewMovieDirector.text = item.director
+        holder.textViewMovieDirector.text = item.director.toString()
         holder.textViewMoviePremiereDate.text = item.premiereDate.split("T")[0]
         val durationString = item.duration.toString() + " min"
         holder.textViewMovieDuration.text = durationString

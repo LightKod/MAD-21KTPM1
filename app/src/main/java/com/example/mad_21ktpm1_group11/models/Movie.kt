@@ -3,17 +3,18 @@ package com.example.mad_21ktpm1_group11.models
 import com.google.gson.annotations.SerializedName
 
 data class Movie(
-    val id: Int,
+    @SerializedName("id") val id: Int,
     @SerializedName("original_title") val name: String,
     val classification: String,
     @SerializedName("release_date") val premiereDate: String,
     @SerializedName("runTime") val duration: Int,
-    val director: String,
+    @SerializedName("director") val director: Int,
     @SerializedName("poster_path") val poster: String,
-    /*val gerne_ids: Array<Int>,
-    val overview: String,
-    val popularity: Float,
-    val actors: Array<Int>,*/
-
+    @SerializedName("backdrop_path") val backdropPath: String,
+    @SerializedName("genre_ids") val genreIds: List<Int>,
+    @SerializedName("overview") val overview: String,
+    @SerializedName("popularity") val popularity: Float,
+    @SerializedName("vote_average") val voteAverage: Float,
+    @SerializedName("actors") val actors: List<Int>
 ) {
 }
