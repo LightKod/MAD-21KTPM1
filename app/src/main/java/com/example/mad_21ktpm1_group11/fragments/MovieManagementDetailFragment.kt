@@ -335,6 +335,9 @@ class MovieManagementDetailFragment : Fragment() {
                                 colorStateList
                             )
                             linearLayout.addView(checkBox)
+                            if(selectedGenres.any { it.id == option.id }){
+                                checkBox.isChecked = true
+                            }
                         }
 
                         val dialogBuilder = AlertDialog.Builder(this@MovieManagementDetailFragment.requireContext())
@@ -481,6 +484,9 @@ class MovieManagementDetailFragment : Fragment() {
                                 colorStateList
                             )
                             linearLayout.addView(checkBox)
+                            if(selectedActors.any { it.id == option.id }){
+                                checkBox.isChecked = true
+                            }
                         }
 
                         val dialogBuilder = AlertDialog.Builder(this@MovieManagementDetailFragment.requireContext())
@@ -542,7 +548,8 @@ class MovieManagementDetailFragment : Fragment() {
         if(inputLayoutMovieName.isErrorEnabled || inputLayoutMovieDuration.isErrorEnabled || inputLayoutMovieRating.isErrorEnabled
             || editTextMovieName.text.isEmpty() || editTextMovieDuration.text.isEmpty() || editTextMovieRating.text.isEmpty()
             || editTextMovieClassification.text.isEmpty() || editTextMovieBanner.text.isEmpty() || editTextMovieGenres.text.isEmpty()
-            || editTextMovieDirector.text.isEmpty() || editTextMovieActors.text.isEmpty()){
+            || editTextMovieDirector.text.isEmpty() || editTextMovieActors.text.isEmpty()
+            || (mode == "add" && chosenUri == null)){
             Toast.makeText(this.requireContext(), "You haven't completed the form yet", Toast.LENGTH_SHORT).show()
         }
         else{
@@ -645,7 +652,111 @@ class MovieManagementDetailFragment : Fragment() {
         editTextMovieName.setText(movie?.name)
         editTextMovieDuration.setText(movie?.duration.toString())
         editTextMovieRating.setText(movie?.voteAverage.toString())
+        // editTextMovieClassification.setText(movie?.classification)
         editTextMovieBanner.setText(movie?.backdropPath)
         editTextMovieOverview.setText(movie?.overview)
+
+        fetchGenresFromIds(movie!!.genreIds) { genres, error ->
+            if(error != null){
+                Toast.makeText(requireContext(), "Something went wrong while fetching data.", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                selectedGenres = genres!!
+                editTextMovieGenres.setText(selectedGenres.joinToString("/") { it.name })
+            }
+        }
+
+        fetchPersonFromId(movie!!.director) { director, error ->
+            if(error != null){
+                Toast.makeText(requireContext(), "Something went wrong while fetching data.", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                selectedDirector = director
+                editTextMovieDirector.setText(selectedDirector?.name)
+            }
+        }
+
+        fetchPeopleFromIds(movie!!.actors) { actors, error ->
+            if(error != null){
+                Toast.makeText(requireContext(), "Something went wrong while fetching data.", Toast.LENGTH_SHORT).show()
+            }
+            else {
+                selectedActors = actors!!
+                editTextMovieActors.setText(selectedActors.joinToString("/") { it.name })
+            }
+        }
+    }
+
+    private fun fetchGenresFromIds(genreIds: List<Int>, callback: (ArrayList<Genre>?, Throwable?) -> Unit) {
+        val genres: ArrayList<Genre> = ArrayList()
+        var remainingIds = genreIds.size
+
+        val genreCallback = object : Callback<Genre> {
+            override fun onResponse(call: Call<Genre>, response: Response<Genre>) {
+                if(response.isSuccessful) {
+                    genres.add(response.body()!!)
+                }
+                remainingIds--
+                if(remainingIds == 0) {
+                    callback(genres, null)
+                }
+            }
+
+            override fun onFailure(call: Call<Genre>, t: Throwable) {
+                remainingIds--
+                if(remainingIds == 0) {
+                    callback(genres, t)
+                }
+            }
+        }
+
+        for (id in genreIds) {
+            val call = genreService.getGenreByID(id)
+            call.enqueue(genreCallback)
+        }
+    }
+
+    private fun fetchPersonFromId(personId: Int, callback: (Person?, Throwable?) -> Unit) {
+        val call = personService.getPersonByID(personId)
+        call.enqueue(object : Callback<Person> {
+            override fun onResponse(call: Call<Person>, response: Response<Person>) {
+                if(response.isSuccessful) {
+                    callback(response.body()!!, null)
+                }
+            }
+
+            override fun onFailure(call: Call<Person>, t: Throwable) {
+                callback(null, t)
+            }
+        })
+    }
+
+    private fun fetchPeopleFromIds(peopleIds: List<Int>, callback: (ArrayList<Person>?, Throwable?) -> Unit) {
+        val people: ArrayList<Person> = ArrayList()
+        var remainingIds = peopleIds.size
+
+        val personCallback = object : Callback<Person> {
+            override fun onResponse(call: Call<Person>, response: Response<Person>) {
+                if(response.isSuccessful) {
+                    people.add(response.body()!!)
+                }
+                remainingIds--
+                if(remainingIds == 0) {
+                    callback(people, null)
+                }
+            }
+
+            override fun onFailure(call: Call<Person>, t: Throwable) {
+                remainingIds--
+                if(remainingIds == 0) {
+                    callback(people, t)
+                }
+            }
+        }
+
+        for (id in peopleIds) {
+            val call = personService.getPersonByID(id)
+            call.enqueue(personCallback)
+        }
     }
 }
