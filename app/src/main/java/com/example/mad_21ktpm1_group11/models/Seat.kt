@@ -12,12 +12,12 @@ data class Seat (
 {
 
     companion object{
-        public enum class SeatStatus {
-            None,
-            Normal,
-            VIP,
-            Booked,
-            Choosing,
+        public enum class SeatStatus (val value: Int){
+            None(0),
+            Normal(1),
+            VIP(2),
+            Booked(3),
+            Choosing(4),
         }
     }
 }

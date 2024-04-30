@@ -169,7 +169,12 @@ class HomeFragment : Fragment() {
         }
 
         bookBtn.setOnClickListener{
-            (this.activity as? MainActivity)?.addFragment(SeatSelectionFragment(), "seat")
+            //TODO: GET MOVIE ID FROM VIEWPAGER
+            val fragment = MovieDetailFragment()
+            fragment.arguments = Bundle().apply {
+                putInt("id", id)
+            }
+            (this.activity as? MainActivity)?.addFragment(fragment, "movie_detail")
         }
 
         imageViewUserIcon.setOnClickListener {

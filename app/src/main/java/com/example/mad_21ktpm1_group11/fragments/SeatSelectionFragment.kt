@@ -14,9 +14,20 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
+import com.example.mad_21ktpm1_group11.api.RoomApi
+import com.example.mad_21ktpm1_group11.api.ScheduleApi
+import com.example.mad_21ktpm1_group11.models.Movie
+import com.example.mad_21ktpm1_group11.models.Person
+import com.example.mad_21ktpm1_group11.models.Room
+import com.example.mad_21ktpm1_group11.models.Schedule
 import com.example.mad_21ktpm1_group11.models.Seat
 import com.example.mad_21ktpm1_group11.views.SeatButton
 import com.example.mad_21ktpm1_group11.views.ZoomLayout
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class SeatSelectionFragment : Fragment(), View.OnTouchListener {
@@ -53,6 +64,12 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
 
     val chosenSeats:  MutableCollection<Seat> = mutableListOf();
 
+    val scheduleID = 955958
+
+    lateinit var schedule: Schedule;
+    lateinit var room: Room;
+    lateinit var movie: Movie;
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -63,10 +80,7 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
 
         init();
         //TODO: add a step to fetch data here
-        setupView()
-        populateView()
-
-        updateOrderDetails();
+        fetchScheduleData()
         return root;
     }
 
@@ -87,9 +101,79 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
         }
     }
 
+    private fun fetchScheduleData(){
+        val scheduleService = RetrofitClient.instance.create(ScheduleApi::class.java)
+        val call = scheduleService.GetScheduleByID(scheduleID)
+        call.enqueue(object : Callback<Schedule> {
+            override fun onResponse(call: Call<Schedule>, response: Response<Schedule>) {
+                if (response.isSuccessful) {
+                    schedule = response.body()!!
+                    Log.i("API", schedule.schedule_id.toString())
+                    fetchMovieData(schedule.movie_id);
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<Schedule>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
+    }
+
+    private fun fetchRoomData(roomID: Int){
+        val roomSerivce = RetrofitClient.instance.create(RoomApi::class.java)
+        val call = roomSerivce.GetRoomById(roomID)
+        call.enqueue(object : Callback<Room> {
+            override fun onResponse(call: Call<Room>, response: Response<Room>) {
+                if (response.isSuccessful) {
+                    room = response.body()!!
+                    Log.i("API", "Fetched Room")
+
+                    updateOrderDetails()
+                    setupView()
+                    populateView()
+
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<Room>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
+    }
+
+    private fun fetchMovieData(movieID: Int){
+        val movieService = RetrofitClient.instance.create(MovieApi::class.java)
+        val call = movieService.getMovieByID(movieID)
+        call.enqueue(object : Callback<Movie> {
+            override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
+                if (response.isSuccessful) {
+                    movie = response.body()!!
+                    Log.i("API", "Fetched Movie")
+
+                    fetchRoomData(schedule.room_id)
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<Movie>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
+    }
+
     private fun updateOrderDetails(){
-
-
+        textMovieName.text = movie.name
         textPrice.text = "$${chosenSeats.sumByDouble{it.price}}";
         textSeatSelected.text = "${chosenSeats.count()} Seats Selected";
     }
