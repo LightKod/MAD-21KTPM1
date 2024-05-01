@@ -108,8 +108,8 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             override fun onResponse(call: Call<Schedule>, response: Response<Schedule>) {
                 if (response.isSuccessful) {
                     schedule = response.body()!!
-                    Log.i("API", schedule.schedule_id.toString())
-                    fetchMovieData(schedule.movie_id);
+                    Log.i("API", schedule.scheduleId.toString())
+                    fetchMovieData(schedule.movieId);
                 } else {
                     val errorMessage = response.message()
                     Log.i("API", errorMessage)
@@ -158,7 +158,7 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
                     movie = response.body()!!
                     Log.i("API", "Fetched Movie")
 
-                    fetchRoomData(schedule.room_id)
+                    fetchRoomData(schedule.roomId)
                 } else {
                     val errorMessage = response.message()
                     Log.i("API", errorMessage)
