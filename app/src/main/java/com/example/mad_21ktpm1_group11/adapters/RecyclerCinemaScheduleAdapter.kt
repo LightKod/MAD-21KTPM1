@@ -12,9 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.models.CinemaSchedule
 
 
-class RecyclerCinemaScheduleAdapter(private val fragment : Fragment, private val cinemaScheduleList: List<String>) : RecyclerView.Adapter<RecyclerCinemaScheduleAdapter.CinemaScheduleViewHolder>() {
+class RecyclerCinemaScheduleAdapter(private val fragment : Fragment, private val cinemaScheduleList: List<CinemaSchedule>) : RecyclerView.Adapter<RecyclerCinemaScheduleAdapter.CinemaScheduleViewHolder>() {
     var isExpanded = false
     class MarginItemDecoration(private val marginPx: Int) : RecyclerView.ItemDecoration() {
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
@@ -42,7 +43,7 @@ class RecyclerCinemaScheduleAdapter(private val fragment : Fragment, private val
 
     override fun onBindViewHolder(holder: CinemaScheduleViewHolder, position: Int) {
         val currentCinemaSchedule = cinemaScheduleList[position]
-        holder.textViewCinemaName.text = currentCinemaSchedule
+        holder.textViewCinemaName.text = currentCinemaSchedule.name
         holder.conTainerLayout.visibility = View.GONE
 
         holder.textViewCinemaName.setOnClickListener {
@@ -63,7 +64,7 @@ class RecyclerCinemaScheduleAdapter(private val fragment : Fragment, private val
 //        val timeAdapter = ButtonTimeAdapter(currentCinemaSchedule.showTimes) { selectedTime ->
             // Xử lý sự kiện khi một thời gian được chọn
 
-        val showTimes = listOf("2:30", "3:40", "4:55", "6:10", "7:25") // Mảng giả lập các thời gian
+        val showTimes = currentCinemaSchedule.schedules // Mảng giả lập các thời gian
         val timeAdapter = ButtonTimeAdapter(fragment,showTimes) { selectedTime ->
             // Xử lý sự kiện khi một thời gian được chọn
             println("Selected time: $selectedTime")

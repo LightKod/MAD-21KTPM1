@@ -100,7 +100,11 @@ class MovieDetailFragment : Fragment() {
         Glide.with(this).load("https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/1/image/c5f0a1eff4c394a251036189ccddaacd/4/7/470x700-kungfupanda4.jpg").into(imagePoster)
 
         btnBook.setOnClickListener {
-            (this.activity as? MainActivity)?.addFragment(BookingTimeFragment(),"bookingTime")
+            val args = Bundle()
+            args.putInt("movieId",movieID)
+            val fragment = BookingTimeFragment()
+            fragment.arguments = args
+            (this.activity as? MainActivity)?.addFragment(fragment,"bookingTime")
         }
 
         btnReview.setOnClickListener{

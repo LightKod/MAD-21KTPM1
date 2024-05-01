@@ -67,6 +67,7 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:5.0.0-rc01")
     implementation("jp.wasabeef:glide-transformations:4.3.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation(files("libs/zpdk-release-v3.1.aar"))
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -77,4 +78,8 @@ dependencies {
     implementation("com.otaliastudios:zoomlayout:1.9.0")
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    //zalo
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("commons-codec:commons-codec:1.14")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta")
 }

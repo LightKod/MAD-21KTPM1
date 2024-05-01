@@ -19,11 +19,17 @@ import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.DateAdapter
 import com.example.mad_21ktpm1_group11.adapters.RecyclerCinemaScheduleAdapter
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
+import com.example.mad_21ktpm1_group11.api.ScheduleApi
+import com.example.mad_21ktpm1_group11.models.CinemaSchedule
 import com.example.mad_21ktpm1_group11.models.OnDateSelectedListener
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -53,8 +59,10 @@ class BookingTimeFragment : Fragment(), OnDateSelectedListener {
     var textViewNextDay5 : TextView ?= null
     var textViewNextDay6 : TextView ?= null
     var textDateSelected : TextView ?= null
+    private lateinit var recyclerViewTime : RecyclerView
     private lateinit var backBtn: ImageButton
     private lateinit var menuBtn: ImageButton
+    private var movieID = 932420
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -76,11 +84,10 @@ class BookingTimeFragment : Fragment(), OnDateSelectedListener {
         textDateSelected = view.findViewById(R.id.textView10)
         init(view)
         initDate(view)
-        val recyclerViewTime: RecyclerView = view.findViewById(R.id.recycleViewCinemaSchedules)
+         recyclerViewTime = view.findViewById(R.id.recycleViewCinemaSchedules)
         val cinemaList = listOf("CGV - Tân Phú", "Galaxy - Hoàng Văn Thụ", "BHD - Vincom", "Lotte - Cantavil")
 
-        val  cinemaAdapter = RecyclerCinemaScheduleAdapter(this,cinemaList)
-        recyclerViewTime.adapter = cinemaAdapter
+
         recyclerViewTime.addItemDecoration(MarginItem(20))
 
         recyclerViewTime.layoutManager = LinearLayoutManager(this.context,LinearLayoutManager.VERTICAL,false)
@@ -137,6 +144,8 @@ class BookingTimeFragment : Fragment(), OnDateSelectedListener {
     override fun onDateSelected(date: Date,radioButton: RadioButton) {
         // Cập nhật RecyclerView dựa trên ngày được chọn
         val dateFormat = SimpleDateFormat("EEEE dd 'tháng' MM, yyyy", Locale.getDefault())
+        val dateSelectedFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dateSelected = dateSelectedFormat.format(date)
         val formattedDate = dateFormat.format(date)
         if(selectedRadioButton!=null)
         {
@@ -144,6 +153,32 @@ class BookingTimeFragment : Fragment(), OnDateSelectedListener {
         }
         selectedRadioButton = radioButton
         textDateSelected?.setText(formattedDate)
+        val scheduleService = RetrofitClient.instance.create(ScheduleApi::class.java)
+        arguments?.takeIf { it.containsKey("movieId") }?.apply {
+            movieID = getInt("movieId")
+        }
+        val call = scheduleService.getSchedulesByDateMovieCinema(dateSelected, movieID)
+        call.enqueue(object : Callback<List<CinemaSchedule>> {
+            override fun onResponse(call: Call<List<CinemaSchedule>>, response: Response<List<CinemaSchedule>>) {
+                if (response.isSuccessful) {
+                    val schedules = response.body()
+                    val  cinemaAdapter = RecyclerCinemaScheduleAdapter(this@BookingTimeFragment,schedules!!)
+                    recyclerViewTime.adapter = cinemaAdapter
+                    Log.d("BookingTimeFragment", "Successful response: $schedules")
+                    // Xử lý dữ liệu nhận được
+                } else {
+                    // Xử lý lỗi
+                    Log.e("BookingTimeFragment", "Error: " + response.code() + " - " + response.message())
+
+                }
+            }
+
+            override fun onFailure(call: Call<List<CinemaSchedule>>, t: Throwable) {
+                // Xử lý lỗi
+                Log.e("BookingTimeFragment", "Error: " + t.message)
+
+            }
+        })
 
         Log.d("Checked RadioButton", "Selected RadioButton: $formattedDate")
 

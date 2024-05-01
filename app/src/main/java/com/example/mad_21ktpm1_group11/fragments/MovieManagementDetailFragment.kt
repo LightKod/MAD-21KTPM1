@@ -39,6 +39,7 @@ import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Person
 import com.google.android.material.textfield.TextInputLayout
 import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -564,23 +565,25 @@ class MovieManagementDetailFragment : Fragment() {
                         input?.copyTo(output)
                     }
                 }
-                val requestFile = RequestBody.create(MediaType.parse("image/*"), file)
+                val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
+//                val requestFile = RequestBody.create(file.toMediaType(), file)
+
                 poster = MultipartBody.Part.createFormData("poster", file.name, requestFile)
             }
 
             if(movie != null){
-                id = RequestBody.create(MediaType.parse("text/plain"), movie!!.id.toString())
+                id = RequestBody.create("text/plain".toMediaTypeOrNull(), movie!!.id.toString())
             }
 
-            val title = RequestBody.create(MediaType.parse("text/plain"), editTextMovieName.text.toString())
-            val runTime = RequestBody.create(MediaType.parse("text/plain"), editTextMovieDuration.text.toString())
-            val voteAverage = RequestBody.create(MediaType.parse("text/plain"), editTextMovieRating.text.toString())
-            val classification = RequestBody.create(MediaType.parse("text/plain"), editTextMovieClassification.text.toString())
-            val backdropPath = RequestBody.create(MediaType.parse("text/plain"), editTextMovieBanner.text.toString())
-            val genreIds = RequestBody.create(MediaType.parse("text/plain"), selectedGenres.joinToString(",") { it.id.toString() })
-            val director = RequestBody.create(MediaType.parse("text/plain"), selectedDirector!!.id.toString())
-            val actors = RequestBody.create(MediaType.parse("text/plain"), selectedActors.joinToString(",") { it.id.toString() })
-            val overview = RequestBody.create(MediaType.parse("text/plain"), editTextMovieOverview.text.toString())
+            val title = RequestBody.create("text/plain".toMediaTypeOrNull(), editTextMovieName.text.toString())
+            val runTime = RequestBody.create("text/plain".toMediaTypeOrNull(), editTextMovieDuration.text.toString())
+            val voteAverage = RequestBody.create("text/plain".toMediaTypeOrNull(), editTextMovieRating.text.toString())
+            val classification = RequestBody.create("text/plain".toMediaTypeOrNull(), editTextMovieClassification.text.toString())
+            val backdropPath = RequestBody.create("text/plain".toMediaTypeOrNull(), editTextMovieBanner.text.toString())
+            val genreIds = RequestBody.create("text/plain".toMediaTypeOrNull(), selectedGenres.joinToString(",") { it.id.toString() })
+            val director = RequestBody.create("text/plain".toMediaTypeOrNull(), selectedDirector!!.id.toString())
+            val actors = RequestBody.create("text/plain".toMediaTypeOrNull(), selectedActors.joinToString(",") { it.id.toString() })
+            val overview = RequestBody.create("text/plain".toMediaTypeOrNull(), editTextMovieOverview.text.toString())
 
             val call = movieService.uploadMovie(poster, id, backdropPath, genreIds, title, overview, voteAverage, actors, director, runTime)
 
