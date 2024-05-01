@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewFoodAdapter
 import com.example.mad_21ktpm1_group11.models.Food
+import com.example.mad_21ktpm1_group11.models.Schedule
 
 class FoodOrderFragment : Fragment() {
     private lateinit var root: View
@@ -22,6 +23,10 @@ class FoodOrderFragment : Fragment() {
 
     val foodBought = hashMapOf<Int, Int>()
 
+    var currentPrice: Double = 0.0;
+    var selectedSeatID: String = "";
+    lateinit var schedule: Schedule;
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,6 +34,17 @@ class FoodOrderFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_food_order, container, false)
+
+        arguments?.takeIf { it.containsKey("schedule") }?.apply {
+            schedule = getSerializable("schedule") as Schedule
+        }
+        arguments?.takeIf { it.containsKey("selectedSeatID") }?.apply {
+            selectedSeatID = getString("selectedSeatID")!!
+        }
+        arguments?.takeIf { it.containsKey("currentPrice") }?.apply {
+            currentPrice = getDouble("currentPrice")
+        }
+
         init()
         return root;
     }
