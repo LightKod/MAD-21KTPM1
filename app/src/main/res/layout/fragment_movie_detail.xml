@@ -7,10 +7,11 @@
     android:background="#FFFFFF"
     tools:context=".fragments.MovieDetailFragment">
 
-    <VideoView
-        android:id="@+id/videoTrailer"
+    <ImageView
+        android:id="@+id/imageBackdrop"
         android:layout_width="0dp"
         android:layout_height="220dp"
+        android:scaleType="fitXY"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,7 +24,7 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="-80dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/videoTrailer" />
+        app:layout_constraintTop_toBottomOf="@+id/imageBackdrop" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/buttonReview"
@@ -44,7 +45,7 @@
         android:textColor="#FFFFFF"
         android:textSize="24dp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/videoTrailer"
+        app:layout_constraintBottom_toBottomOf="@+id/imageBackdrop"
         app:layout_constraintStart_toStartOf="@+id/textDate" />
 
     <TextView
@@ -55,7 +56,7 @@
         android:layout_marginTop="10dp"
         android:text="08/03/2024"
         app:layout_constraintStart_toEndOf="@+id/imagePoster"
-        app:layout_constraintTop_toBottomOf="@+id/videoTrailer" />
+        app:layout_constraintTop_toBottomOf="@+id/imageBackdrop" />
 
     <TextView
         android:id="@+id/textTime"

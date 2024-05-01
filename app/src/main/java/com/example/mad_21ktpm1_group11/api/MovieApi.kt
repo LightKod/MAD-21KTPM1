@@ -1,5 +1,6 @@
 package com.example.mad_21ktpm1_group11.api
 import com.example.mad_21ktpm1_group11.models.Movie
+import com.example.mad_21ktpm1_group11.models.Person
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -21,6 +22,9 @@ interface MovieApi {
 
     @GET("movies")
     fun getAllMovies(): Call<List<Movie>>
+
+    @GET("movies/{id}/persons-involved")
+    fun getAllPersonInvolved(@Path("id") id: Int): Call<List<Person>>
 
     @GET("movies/search")
     fun getMoviesByName(@Query("keyword") keyword: String, @Query("currently_showing") currentlyShowing: Boolean): Call<List<Movie>>

@@ -19,6 +19,7 @@ import com.example.mad_21ktpm1_group11.api.MovieApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.AuthResponse
 import com.example.mad_21ktpm1_group11.models.Movie
+import com.example.mad_21ktpm1_group11.models.Person
 import com.example.mad_21ktpm1_group11.models.Review
 import retrofit2.Call
 import retrofit2.Callback
@@ -33,15 +34,18 @@ class MovieDetailFragment : Fragment() {
     private lateinit var btnReview: AppCompatButton
 
 
-    private lateinit var videoTrailer: VideoView
+    private lateinit var imageBackdrop: ImageView
     private lateinit var imagePoster: ImageView
 
     private lateinit var textMovieName: TextView
     private lateinit var textDate: TextView
     private lateinit var textTime: TextView
     private lateinit var textDescription: TextView
+    private lateinit var textCast: TextView
+    private lateinit var textDirector: TextView
 
     private var movieID = 438631
+    private lateinit var people: List<Person>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,7 +74,7 @@ class MovieDetailFragment : Fragment() {
                     // Handle successful response
                     movie = response.body()!!
                     Log.i("API", movie.name)
-                    SetValue()
+                    fetchPeopleData()
                 } else {
                     val errorMessage = response.message()
                     Log.i("API", errorMessage)
@@ -84,20 +88,41 @@ class MovieDetailFragment : Fragment() {
         })
     }
 
+    private fun fetchPeopleData(){
+        val movieService = RetrofitClient.instance.create(MovieApi::class.java)
+        val call = movieService.getAllPersonInvolved(movie.id)
+        call.enqueue(object : Callback<List<Person>> {
+            override fun onResponse(call: Call<List<Person>>, response: Response<List<Person>>) {
+                if (response.isSuccessful) {
+                    people = response.body()!!
+                    setValue()
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<List<Person>>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
+    }
+
     private fun init()
     {
         btnBook = root.findViewById(R.id.buttonBook)
         btnReview = root.findViewById(R.id.buttonReview)
 
-        videoTrailer = root.findViewById(R.id.videoTrailer)
+        imageBackdrop = root.findViewById(R.id.imageBackdrop)
         imagePoster = root.findViewById(R.id.imagePoster)
 
         textMovieName = root.findViewById(R.id.textMovieName)
         textDate = root.findViewById(R.id.textDate)
         textTime = root.findViewById(R.id.textTime)
         textDescription = root.findViewById(R.id.textDescription)
-
-        Glide.with(this).load("https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/1/image/c5f0a1eff4c394a251036189ccddaacd/4/7/470x700-kungfupanda4.jpg").into(imagePoster)
+        textCast = root.findViewById(R.id.textCast)
+        textDirector = root.findViewById(R.id.textDirector)
 
         btnBook.setOnClickListener {
             val args = Bundle()
@@ -112,12 +137,19 @@ class MovieDetailFragment : Fragment() {
         }
     }
 
-    private fun SetValue()
+    private fun setValue()
     {
+        val castlist = people.subList(1, people.size)
+        val namesString = castlist.joinToString(separator = ", ") { it.name }
+
         textMovieName.text = movie.name;
         textDate.text = extractDate(movie.premiereDate);
         textTime.text = formatTime((movie.duration))
+        textDirector.text = people[0].name
+        textCast.text = namesString
+
         Glide.with(this).load( "https://image.tmdb.org/t/p/original" + movie.poster).into(imagePoster)
+        Glide.with(this).load( "https://image.tmdb.org/t/p/original" + movie.backdropPath).into(imageBackdrop)
     }
 
 
