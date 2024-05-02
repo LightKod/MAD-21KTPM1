@@ -23,6 +23,7 @@ import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.api.ScheduleApi
 import com.example.mad_21ktpm1_group11.models.CinemaSchedule
 import com.example.mad_21ktpm1_group11.models.OnDateSelectedListener
+import com.example.mad_21ktpm1_group11.models.Schedule
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

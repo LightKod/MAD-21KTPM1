@@ -46,8 +46,12 @@ public class HttpProvider {
                 Log.println(Log.ERROR, "BAD_REQUEST", response.body().string());
                 data = null;
             } else {
-                Log.d("DataSuccess", response.body().string());
+//                Log.d("DataSuccess", response.body().string());
+                assert response.body() != null;
                 data = new JSONObject(response.body().string());
+                Log.d("DataSuccess2", data.toString());
+
+                return  data;
             }
 
         }  catch (IOException | JSONException e) {

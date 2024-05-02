@@ -72,7 +72,9 @@ public class CreateOrder {
          }
 
         JSONObject data = HttpProvider.sendPost(AppInfo.URL_CREATE_ORDER, formBody);
-        return data;
+         Log.d("DataZalo", data.toString());
+
+         return data;
     }
 }
 

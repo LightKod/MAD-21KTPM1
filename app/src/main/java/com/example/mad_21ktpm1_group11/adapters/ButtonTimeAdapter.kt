@@ -38,6 +38,8 @@ class ButtonTimeAdapter(private val fragment : Fragment, private val timeList: L
             Log.d("chuyenSangKhac","da chuyen")
             val args = Bundle()
             args.putSerializable("schedule", timeList[position])
+            Log.d("chuyenSangKhac",timeList[position].toString())
+
             val fragmentSeatSelection = SeatSelectionFragment()
             fragmentSeatSelection.arguments = args
             (fragment.activity as? MainActivity)?.addFragment(fragmentSeatSelection,"seatSelection")

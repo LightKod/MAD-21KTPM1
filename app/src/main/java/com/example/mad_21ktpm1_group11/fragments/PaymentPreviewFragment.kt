@@ -38,7 +38,7 @@ class PaymentPreviewFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_payment_preview, container, false)
 
         // ZaloPay SDK Init
-        ZaloPaySDK.init(2553, Environment.SANDBOX)
+        ZaloPaySDK.init(554, Environment.SANDBOX)
 
         init(view)
 
@@ -77,8 +77,8 @@ class PaymentPreviewFragment : Fragment() {
                     val data =  orderApi.createOrder("500000")
                     if(data!=null)
                     {
-                        Log.d("Amount", "500000")
-                        Log.d("dataZalo",  data.toString())
+                        Log.i("Amount", "500000")
+                        Log.i("dataZalo",  data.toString())
 
                     }
 
@@ -104,10 +104,10 @@ class PaymentPreviewFragment : Fragment() {
                                     Log.d("ZaloPay", "Payment canceled")
                                 }
 
-                                override fun onPaymentError(zaloPayErrorCode: ZaloPayError?, zpTransToken: String?, appTransID: String?) {
-                                    // Xử lý khi có lỗi xảy ra trong quá trình thanh toán
-                                    // Redirect to Zalo/ZaloPay Store when zaloPayError == ZaloPayError.PAYMENT_APP_NOT_FOUND
-                                    Log.d("ZaloPay", "Payment error: ${zaloPayErrorCode?.name}")
+                                 // Redirect to Zalo/ZaloPay Store when zaloPayError == ZaloPayError.PAYMENT_APP_NOT_FOUND
+                                    override fun onPaymentError(zaloPayErrorCode: ZaloPayError?, zpTransToken: String?, appTransID: String?) {
+                                        // Xử lý khi có lỗi xảy ra trong quá trình thanh toán
+                                        Log.d("ZaloPay", "Payment error: ${zaloPayErrorCode?.name}")
                                 }
 
                                 override fun onPaymentSucceeded(transactionId: String, transToken: String, appTransID: String?) {
