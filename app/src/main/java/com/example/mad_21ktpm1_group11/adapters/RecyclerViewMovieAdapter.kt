@@ -2,6 +2,7 @@ package com.example.mad_21ktpm1_group11.adapters
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +13,18 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.PersonApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.Movie
+import com.example.mad_21ktpm1_group11.models.Person
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class RecyclerViewMovieAdapter(private val fragment : Fragment, private var movies: List<Movie>): RecyclerView.Adapter<RecyclerViewMovieAdapter.ViewHolder>() {
     lateinit var onItemClick: ((Int) -> Unit)
+    private val personService = RetrofitClient.instance.create(PersonApi::class.java)
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
         val moviePoster = view.findViewById<ImageView>(R.id.moviePoster)
@@ -48,7 +57,6 @@ class RecyclerViewMovieAdapter(private val fragment : Fragment, private var movi
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item: Movie = movies[position]
         holder.textViewMovieName.text = item.name
-        holder.textViewMovieDirector.text = item.director.toString()
         holder.textViewMoviePremiereDate.text = item.premiereDate.split("T")[0]
         val durationString = item.duration.toString() + " min"
         holder.textViewMovieDuration.text = durationString
@@ -88,6 +96,23 @@ class RecyclerViewMovieAdapter(private val fragment : Fragment, private var movi
                 }
             }
         }
+
+
+        val call = personService.getPersonByID(item.director)
+
+        call.enqueue(object : Callback<Person> {
+            override fun onResponse(call: Call<Person>, response: Response<Person>) {
+                if (response.isSuccessful) {
+                    holder.textViewMovieDirector.text = response.body()!!.name
+                } else {
+                    holder.textViewMovieDirector.text = item.director.toString()
+                }
+            }
+
+            override fun onFailure(call: Call<Person>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
     }
 
     fun updateList(newList: List<Movie>){

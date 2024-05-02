@@ -35,7 +35,7 @@ class ButtonTimeAdapter(private val fragment : Fragment, private val timeList: L
         val currentTime = timeList[position].scheduleStart
         holder.buttonTime.text = currentTime
         holder.buttonTime.setOnClickListener { onItemClick(currentTime)
-            Log.d("chuyenSangKhac","da chuyen")
+            Log.d("chuyenSangKhac","da chuyen" + timeList[position])
             val args = Bundle()
             args.putSerializable("schedule", timeList[position])
             Log.d("chuyenSangKhac",timeList[position].toString())

@@ -66,7 +66,7 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
 
             when (motionEvent.action and MotionEvent.ACTION_MASK) {
                 MotionEvent.ACTION_DOWN -> {
-                    Log.i(TAG, "DOWN")
+                    //Log.i(TAG, "DOWN")
                     mode = Mode.DRAG
                     startX = motionEvent.x - prevDx
                     startY = motionEvent.y - prevDy
@@ -78,16 +78,16 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
                     dx = motionEvent.x - startX
                     dy = motionEvent.y - startY
 
-                    Log.i(
-                        TAG,
-                        "DX: " + dx + "  DY: " + dy
-                    )
+                    //Log.i(
+                    //    TAG,
+                    //    "DX: " + dx + "  DY: " + dy
+                    //)
                 }
 
                 MotionEvent.ACTION_POINTER_DOWN -> mode = Mode.ZOOM
                 MotionEvent.ACTION_POINTER_UP -> mode = Mode.DRAG
                 MotionEvent.ACTION_UP -> {
-                    Log.i(TAG, "UP")
+                    //Log.i(TAG, "UP")
                     mode = Mode.NONE
                     prevDx = dx
                     prevDy = dy
@@ -110,17 +110,17 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
             dy = Math.min(Math.max(dy, 0.0f -300), maxDy)
 
 
-            Log.i(
-                TAG,
-                "Width: " + child().width + ", scale " + scale + ", dx " + dx
-                        + ", max " + maxDx
-            )
+            //Log.i(
+            //    TAG,
+            //    "Width: " + child().width + ", scale " + scale + ", dx " + dx
+            //            + ", max " + maxDx
+            //)
 
-            Log.i(
-                TAG,
-                "Height: " + child().height + ", scale " + scale + ", dy " + dy
-                        + ", max " + maxDy
-            )
+            //Log.i(
+            //    TAG,
+            //    "Height: " + child().height + ", scale " + scale + ", dy " + dy
+            //            + ", max " + maxDy
+            //)
             applyScaleAndTranslation()
             view.invalidate()
             view.performClick()
@@ -129,13 +129,13 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
     }
 
     override fun onScaleBegin(scaleDetector: ScaleGestureDetector): Boolean {
-        Log.i(TAG, "onScaleBegin")
+        //Log.i(TAG, "onScaleBegin")
         return true
     }
 
     override fun onScale(scaleDetector: ScaleGestureDetector): Boolean {
         val scaleFactor = scaleDetector.scaleFactor
-        Log.i(TAG, "onScale$scaleFactor")
+        //Log.i(TAG, "onScale$scaleFactor")
         if (lastScaleFactor == 0f || Math.signum(scaleFactor) == Math.signum(lastScaleFactor)) {
             scale *= scaleFactor
             scale = Math.max(MIN_ZOOM, Math.min(scale, MAX_ZOOM))
@@ -147,7 +147,7 @@ class ZoomLayout : RelativeLayout, OnScaleGestureListener {
     }
 
     override fun onScaleEnd(scaleDetector: ScaleGestureDetector) {
-        Log.i(TAG, "onScaleEnd")
+        //Log.i(TAG, "onScaleEnd")
     }
 
     private fun applyScaleAndTranslation() {

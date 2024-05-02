@@ -28,6 +28,9 @@ import com.example.mad_21ktpm1_group11.views.ZoomLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.NumberFormat
+import java.util.Currency
+import java.util.Locale
 
 
 class SeatSelectionFragment : Fragment(), View.OnTouchListener {
@@ -45,9 +48,6 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
 
     private var mainID: Int = 0;
 
-    private var columns = 20
-    private var rows = 10
-
     private val SEAT_SIZE = 125;
     private val SEAT_PADDING = 5;
 
@@ -55,16 +55,9 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     private val PADDING_VER = 500;
 
     private lateinit var seats: Array<Array<Seat>>
-
-    val COLOR_BOOKED = Color.parseColor("#dbd7cd")
-    val COLOR_CHOOSING = Color.parseColor("#ad2b33")
-    val COLOR_VIP  = Color.parseColor("#914456")
-    val COLOR_NONE  = Color.parseColor("#222222")
-    val COLOR_NORMAL = Color.parseColor("#aa9c8f")
-
     val chosenSeats:  MutableCollection<Seat> = mutableListOf();
 
-    val scheduleID = 955958
+    var scheduleID = 955958
 
     lateinit var schedule: Schedule;
     lateinit var room: Room;
@@ -77,10 +70,14 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     ): View? {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_seat_selection, container, false)
+        arguments?.takeIf { it.containsKey("schedule") }?.apply {
+            schedule = getSerializable("schedule") as Schedule
+        }
+        Log.i("API", schedule.scheduleId.toString())
 
         init();
         //TODO: add a step to fetch data here
-        fetchScheduleData()
+        fetchMovieData(schedule.movieId);
         return root;
     }
 
@@ -97,11 +94,23 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
         buttonPay = root.findViewById(R.id.buttonPay)
 
         buttonPay.setOnClickListener{
-            (this.activity as? MainActivity)?.addFragment(FoodOrderFragment(), "food")
+            if(chosenSeats.count() == 0) return@setOnClickListener;
+            var fragment = FoodOrderFragment()
+            val args = Bundle()
+            val idsString = chosenSeats.joinToString(separator = "|") { it.id.toString() }
+            Log.i("API", "Test: " + idsString)
+            args.putSerializable("schedule", schedule)
+            args.putString("selectedSeatID", idsString)
+            args.putDouble("currentPrice", chosenSeats.sumOf{it.price})
+            args.putString("movieName", movie.name)
+            fragment.arguments = args;
+            (this.activity as? MainActivity)?.addFragment(fragment, "food")
         }
     }
 
     private fun fetchScheduleData(){
+        Log.i("API", scheduleID.toString())
+
         val scheduleService = RetrofitClient.instance.create(ScheduleApi::class.java)
         val call = scheduleService.GetScheduleByID(scheduleID)
         call.enqueue(object : Callback<Schedule> {
@@ -148,7 +157,6 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             }
         })
     }
-
     private fun fetchMovieData(movieID: Int){
         val movieService = RetrofitClient.instance.create(MovieApi::class.java)
         val call = movieService.getMovieByID(movieID)
@@ -171,16 +179,18 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             }
         })
     }
-
     private fun updateOrderDetails(){
         textMovieName.text = movie.name
-        textPrice.text = "$${chosenSeats.sumByDouble{it.price}}";
+        textPrice.text = formatToVND(chosenSeats.sumOf{it.price});
         textSeatSelected.text = "${chosenSeats.count()} Seats Selected";
     }
 
 
     private fun setupView()
     {
+        val columns = room.columns;
+        val rows = room.rows
+
         var width = PADDING_VER * 2 + (SEAT_SIZE + SEAT_PADDING) * columns
         var height = PADDING_HOR * 2 + (SEAT_SIZE + SEAT_PADDING) * (1 + rows)
 
@@ -218,11 +228,24 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     fun populateView()
     {
         val PADDING_TOP = PADDING_HOR
+        val columns = room.columns;
+        val rows = room.rows
 
         //TODO: Get this from the DATABASE
         seats = Array(rows) { row ->
             Array(columns) { column ->
-                Seat("A0" ,Seat.Companion.SeatStatus.Normal,Seat.Companion.SeatStatus.Normal,COLOR_NORMAL) // Initialize each seat with the None status
+                val id = row * columns + column
+                val seatStatus =
+                    Seat.Companion.SeatStatus.fromInt(room.seats[id])
+
+                Seat(
+                    "A0",
+                    id,
+                    seatStatus,
+                    seatStatus,
+                    seatStatus.color,
+                    seatStatus.price
+                )
             }
         }
 
@@ -231,6 +254,8 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             {
                 val seatName = mapToAlphabet(y)+x.toString();
                 seats[y][x].name = seatName;
+
+                //Log.i("SEAT", x.toString() + "|" + y.toString() +": " + seats[y][x].status.toString())
             }
         }
 
@@ -239,6 +264,8 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             for (x in 0 until columns){
 
                 var seatButton = SeatButton(mainLayout.context)
+                seatButton.elevation = 0f
+                seatButton.stateListAnimator = null
 
                 val layoutParams = RelativeLayout.LayoutParams(SEAT_SIZE, SEAT_SIZE)
                 layoutParams.setMargins(x * (SEAT_SIZE + SEAT_PADDING) + PADDING_VER,y * (SEAT_SIZE + SEAT_PADDING) + PADDING_TOP,0,0)
@@ -246,25 +273,27 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
 
                 var seatData =  seats[y][x]
 
-                seatButton.text = seatData.name;
                 seatButton.setTextColor(Color.parseColor("#FFFFFF"))
-
                 seatButton.setBackgroundColor(seatData.defaultColor)
+                if(seatData.status != Seat.Companion.SeatStatus.None) seatButton.text = seatData.name
+
 
 
                 seatButton.setOnClickListener {
-                    when(seatData.status){
+                    when(seatData.status) {
                         Seat.Companion.SeatStatus.None -> {
 
                         }
+
                         Seat.Companion.SeatStatus.Choosing -> {
                             seatButton.setBackgroundColor(seatData.defaultColor)
                             seatData.status = seatData.defaultStatus
                             chosenSeats.remove(seatData);
 
                         }
+
                         else -> {
-                            seatButton.setBackgroundColor(COLOR_CHOOSING)
+                            seatButton.setBackgroundColor(Seat.COLOR_CHOOSING)
                             seatData.status = Seat.Companion.SeatStatus.Choosing
                             chosenSeats.add(seatData);
                         }
@@ -290,5 +319,12 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     {
         zoomLayout.init(this.context);
         return false;
+    }
+
+
+    fun formatToVND(amount: Double): String {
+        val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
+        formatter.currency = Currency.getInstance("VND")
+        return formatter.format(amount)
     }
 }

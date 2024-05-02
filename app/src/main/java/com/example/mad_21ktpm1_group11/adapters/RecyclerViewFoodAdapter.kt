@@ -15,6 +15,8 @@ import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.models.Food
 import com.example.mad_21ktpm1_group11.models.Movie
+import java.text.NumberFormat
+import java.util.*
 
 class RecyclerViewFoodAdapter(private val fragment : Fragment, private val foods: List<Food>): RecyclerView.Adapter<RecyclerViewFoodAdapter.ViewHolder>()
 {
@@ -64,10 +66,16 @@ class RecyclerViewFoodAdapter(private val fragment : Fragment, private val foods
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item: Food = foods[position]
 
-        holder.textFoodName.text ="${item.name} - $${item.price}" ;
+        holder.textFoodName.text = item.name + " - " + formatToVND(item.price);
         holder.textFoodDescription.text = item.description;
         Glide.with(fragment).load(item.poster).into(holder.imagePoster)
 
         Log.i("View", "Checked");
+
+    }
+    fun formatToVND(amount: Double): String {
+        val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
+        formatter.currency = Currency.getInstance("VND")
+        return formatter.format(amount)
     }
 }

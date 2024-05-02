@@ -4,6 +4,7 @@ import android.Manifest
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
@@ -15,6 +16,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -25,11 +27,27 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.ImageURLAdapter
+import com.example.mad_21ktpm1_group11.api.CinemaApi
+import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.RetrofitClient
+import com.example.mad_21ktpm1_group11.models.Cinema
+import com.example.mad_21ktpm1_group11.models.Movie
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.tasks.Task
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import kotlin.math.max
+import kotlin.math.min
 
 class MapFragment : Fragment() {
     private lateinit var menuBtn: ImageButton
@@ -37,11 +55,14 @@ class MapFragment : Fragment() {
     private lateinit var ticketBtn: ImageButton
 
     private lateinit var bottom_sheet_layout: CoordinatorLayout
+    private lateinit var bottomSheet: ConstraintLayout
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     private lateinit var viewPagerPromotion: ViewPager2
     private lateinit var promotionImageList: ArrayList<String>
     private lateinit var viewPagerPromotionAdapter: ImageURLAdapter
 
+    private lateinit var textViewCinemaName: TextView
     private lateinit var textViewCinemaAddress: TextView
 
     private val PERMISSIONS = arrayOf(
@@ -55,6 +76,12 @@ class MapFragment : Fragment() {
         LatLng(10.770430176518737, 106.66989703617679)
     )
 
+    private lateinit var cinemas: ArrayList<Cinema>
+
+    private lateinit var mMap: GoogleMap
+    private lateinit var currentLocation: Location
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -64,11 +91,7 @@ class MapFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_map, container, false)
-
-        init(view)
-
-        return view
+        return inflater.inflate(R.layout.fragment_map, container, false)
     }
 
     private fun init(view: View){
@@ -84,11 +107,11 @@ class MapFragment : Fragment() {
             (this.activity as? MainActivity)?.goBack()
         }
 
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
         ticketBtn.setOnClickListener {
             (this.activity as? MainActivity)?.addFragment(TicketFragment(), "ticket")
         }
-
-        bottom_sheet_layout = view.findViewById(R.id.bottom_sheet_layout)
 
         viewPagerPromotion = view.findViewById(R.id.viewPagerPromotion)
 
@@ -111,11 +134,18 @@ class MapFragment : Fragment() {
         advertisementTransformer.addTransformer(MarginPageTransformer(30))
         viewPagerPromotion.setPageTransformer(advertisementTransformer)
 
+        textViewCinemaName = view.findViewById(R.id.textViewCinemaName)
         textViewCinemaAddress = view.findViewById(R.id.textViewCinemaAddress)
+
+        bottomSheet = view.findViewById(R.id.bottom_sheet)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        init(view)
 
         activity?.let{
             if(hasPermissions(activity as Context, PERMISSIONS)){
@@ -127,48 +157,55 @@ class MapFragment : Fragment() {
         }
     }
 
+    @SuppressLint("MissingPermission")
     private val callback = OnMapReadyCallback { googleMap ->
-        LOCATIONS.forEach {
-            googleMap.addMarker(MarkerOptions().position(it).title("${it.latitude}, ${it.longitude}"))
+        mMap = googleMap
+        cinemas.forEach {
+            val marker = googleMap.addMarker(MarkerOptions().position(LatLng(it.latitude, it.longitude)))
+            marker?.tag = it
         }
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LOCATIONS[0], 20.0f))
-
         googleMap.setOnMarkerClickListener {
-            textViewCinemaAddress.text = it.title
-            if(bottom_sheet_layout.visibility == View.GONE){
-                bottom_sheet_layout.visibility = View.VISIBLE
-                ObjectAnimator.ofFloat(bottom_sheet_layout, "translationY", bottom_sheet_layout.height.toFloat(), 0f).apply {
-                    duration = 300
-                    start()
-                }
-            }
+            val data = it.tag as Cinema
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(data.latitude, data.longitude), 15.0f))
+            textViewCinemaName.text = data.name
+            textViewCinemaAddress.text = data.address
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             it.hideInfoWindow()
             true
         }
 
         googleMap.setOnMapClickListener {
-            if(bottom_sheet_layout.visibility == View.VISIBLE){
-                ObjectAnimator.ofFloat(bottom_sheet_layout, "translationY", 0f, bottom_sheet_layout.height.toFloat()).apply {
-                    duration = 300
-                    addListener(object: AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            bottom_sheet_layout.visibility = View.GONE
-                        }
-                    })
-                    start()
-                }
-            }
+            googleMap.animateCamera(CameraUpdateFactory.zoomTo(14.0f))
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
 
         if(hasPermissions(activity as Context, PERMISSIONS)) {
             googleMap.isMyLocationEnabled = true
+            zoomToCurrentPosition()
         }
     }
 
     private fun getMap(){
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+        val cinemaService = RetrofitClient.instance.create(CinemaApi::class.java)
+        val call = cinemaService.getAllCinemas()
+
+        call.enqueue(object : Callback<List<Cinema>> {
+            override fun onResponse(call: Call<List<Cinema>>, response: Response<List<Cinema>>) {
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    cinemas = ArrayList(response.body()!!)
+                    val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+                    mapFragment?.getMapAsync(callback)
+                } else {
+                    (this@MapFragment.activity as? MainActivity)?.goBack()
+                }
+            }
+
+            override fun onFailure(call: Call<List<Cinema>>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
     }
 
     private fun hasPermissions(context: Context, permissions: Array<String>): Boolean = permissions.all {
@@ -185,6 +222,20 @@ class MapFragment : Fragment() {
         }
         else{
             (this.activity as? MainActivity)?.goBack()
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun zoomToCurrentPosition(){
+        if(!hasPermissions(requireContext(), PERMISSIONS)){
+            return
+        }
+        val task: Task<Location> = fusedLocationProviderClient.getLastLocation()
+        task.addOnSuccessListener {
+            if(it != null){
+                currentLocation = it
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(currentLocation.latitude, currentLocation.longitude), 15.0f))
+            }
         }
     }
 }
