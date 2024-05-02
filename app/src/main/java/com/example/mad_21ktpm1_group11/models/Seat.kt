@@ -8,7 +8,7 @@ data class Seat (
     var status: SeatStatus = SeatStatus.None,
     var defaultStatus: SeatStatus = SeatStatus.None,
     var defaultColor: Int = Color.parseColor("#222222"),
-    var price: Double = 2.0,
+    var price: Double = 75000.0,
 )
 {
 
@@ -19,12 +19,12 @@ data class Seat (
         val COLOR_NONE = Color.parseColor("#222222")
         val COLOR_NORMAL = Color.parseColor("#aa9c8f")
 
-        enum class SeatStatus(val value: Int, val color: Int) {
-            None(0, COLOR_NONE),
-            Normal(1, COLOR_NORMAL),
-            VIP(2, COLOR_VIP),
-            Booked(3, COLOR_BOOKED),
-            Choosing(4, COLOR_CHOOSING);
+        enum class SeatStatus(val value: Int, val color: Int, val price: Double) {
+            None(0, COLOR_NONE, 0.0),
+            Normal(1, COLOR_NORMAL, 75000.0),
+            VIP(2, COLOR_VIP, 120000.0),
+            Booked(3, COLOR_BOOKED, 0.0),
+            Choosing(4, COLOR_CHOOSING, 0.0);
 
             companion object {
                 fun fromInt(value: Int) = values().first { it.value == value }

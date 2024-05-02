@@ -28,6 +28,9 @@ import com.example.mad_21ktpm1_group11.views.ZoomLayout
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.NumberFormat
+import java.util.Currency
+import java.util.Locale
 
 
 class SeatSelectionFragment : Fragment(), View.OnTouchListener {
@@ -91,15 +94,17 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
         buttonPay = root.findViewById(R.id.buttonPay)
 
         buttonPay.setOnClickListener{
+            if(chosenSeats.count() == 0) return@setOnClickListener;
             var fragment = FoodOrderFragment()
             val args = Bundle()
             val idsString = chosenSeats.joinToString(separator = "|") { it.id.toString() }
-
+            Log.i("API", "Test: " + idsString)
             args.putSerializable("schedule", schedule)
-            args.putSerializable("selectedSeatID", idsString)
-            args.putSerializable("currentPrice", chosenSeats.sumOf{it.price})
+            args.putString("selectedSeatID", idsString)
+            args.putDouble("currentPrice", chosenSeats.sumOf{it.price})
+            args.putString("movieName", movie.name)
             fragment.arguments = args;
-            (this.activity as? MainActivity)?.addFragment(FoodOrderFragment(), "food")
+            (this.activity as? MainActivity)?.addFragment(fragment, "food")
         }
     }
 
@@ -176,7 +181,7 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     }
     private fun updateOrderDetails(){
         textMovieName.text = movie.name
-        textPrice.text = "$${chosenSeats.sumOf{it.price}}";
+        textPrice.text = formatToVND(chosenSeats.sumOf{it.price});
         textSeatSelected.text = "${chosenSeats.count()} Seats Selected";
     }
 
@@ -238,8 +243,9 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
                     id,
                     seatStatus,
                     seatStatus,
-                    seatStatus.color
-                ) // Initialize each seat with the None status
+                    seatStatus.color,
+                    seatStatus.price
+                )
             }
         }
 
@@ -313,5 +319,12 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     {
         zoomLayout.init(this.context);
         return false;
+    }
+
+
+    fun formatToVND(amount: Double): String {
+        val formatter = NumberFormat.getCurrencyInstance(Locale("vi", "VN"))
+        formatter.currency = Currency.getInstance("VND")
+        return formatter.format(amount)
     }
 }

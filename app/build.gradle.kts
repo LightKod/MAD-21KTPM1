@@ -83,4 +83,6 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("commons-codec:commons-codec:1.14")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta")
+
+    implementation("com.google.code.gson:gson:2.8.8")
 }
