@@ -41,6 +41,6 @@ class ViewPagerMovieAdapter(private val fragment : Fragment, private val movieLi
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Glide.with(fragment).load("https://image.tmdb.org/t/p/original" + movieList[position].poster).into(holder.imageView)
+        Glide.with(fragment).load(movieList[position].poster).into(holder.imageView)
     }
 }

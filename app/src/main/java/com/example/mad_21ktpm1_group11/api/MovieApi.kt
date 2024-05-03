@@ -41,7 +41,8 @@ interface MovieApi {
         @Part("vote_average") voteAverage: RequestBody,
         @Part("actors") actors: RequestBody,
         @Part("director") director: RequestBody,
-        @Part("runTime") runTime: RequestBody
+        @Part("runTime") runTime: RequestBody,
+        @Part("classification") classification: RequestBody
     ): Call<ResponseBody>
 
     @DELETE("movies/delete/{id}")
