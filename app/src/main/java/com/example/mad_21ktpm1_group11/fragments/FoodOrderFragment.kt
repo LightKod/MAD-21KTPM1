@@ -136,6 +136,10 @@ class FoodOrderFragment : Fragment() {
         val jsonOrder = gson.toJson(order) //val orderFromJson = gson.fromJson(jsonOrder, Order::class.java)
         val args = Bundle()
         args.putString("order", jsonOrder)
+        args.putInt("movieId",schedule.movieId)
+        args.putInt("cinamaId",schedule.cinemaId)
+        args.putString("roomId",schedule.roomId.toString())
+        Log.i("movieId",schedule.movieId.toString())
         fragment.arguments = args;
 
         val orderApi = RetrofitClient.instance.create(OrderApi::class.java)

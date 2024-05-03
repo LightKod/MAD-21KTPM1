@@ -1,6 +1,7 @@
 package com.example.mad_21ktpm1_group11
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -32,6 +33,7 @@ import com.example.mad_21ktpm1_group11.models.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import vn.zalopay.sdk.ZaloPaySDK
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -279,5 +281,9 @@ class MainActivity : AppCompatActivity() {
         logoutBtn.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
         manageScheduleBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
         manageMoviesBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
+    }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        ZaloPaySDK.getInstance().onResult(intent)
     }
 }
