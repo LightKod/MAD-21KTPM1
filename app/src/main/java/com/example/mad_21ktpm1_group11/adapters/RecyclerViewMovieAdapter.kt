@@ -60,7 +60,7 @@ class RecyclerViewMovieAdapter(private val fragment : Fragment, private var movi
         holder.textViewMoviePremiereDate.text = item.premiereDate.split("T")[0]
         val durationString = item.duration.toString() + " min"
         holder.textViewMovieDuration.text = durationString
-        Glide.with(fragment).load("https://image.tmdb.org/t/p/original" + item.poster).into(holder.moviePoster)
+        Glide.with(fragment).load(item.poster).into(holder.moviePoster)
 
         if(item.classification != null){
             when(item.classification){

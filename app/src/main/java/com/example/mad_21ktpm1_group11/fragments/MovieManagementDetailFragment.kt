@@ -585,7 +585,7 @@ class MovieManagementDetailFragment : Fragment() {
             val actors = RequestBody.create("text/plain".toMediaTypeOrNull(), selectedActors.joinToString(",") { it.id.toString() })
             val overview = RequestBody.create("text/plain".toMediaTypeOrNull(), editTextMovieOverview.text.toString())
 
-            val call = movieService.uploadMovie(poster, id, backdropPath, genreIds, title, overview, voteAverage, actors, director, runTime)
+            val call = movieService.uploadMovie(poster, id, backdropPath, genreIds, title, overview, voteAverage, actors, director, runTime, classification)
 
             call.enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -648,14 +648,14 @@ class MovieManagementDetailFragment : Fragment() {
     }
 
     private fun setData(){
-        Glide.with(this.requireContext()).load("https://image.tmdb.org/t/p/original" + movie?.poster).into(imageViewMoviePosterPreview)
+        Glide.with(this.requireContext()).load(movie?.poster).into(imageViewMoviePosterPreview)
         if(imageViewMoviePosterPreview.visibility == View.GONE){
             imageViewMoviePosterPreview.visibility = View.VISIBLE
         }
         editTextMovieName.setText(movie?.name)
         editTextMovieDuration.setText(movie?.duration.toString())
         editTextMovieRating.setText(movie?.voteAverage.toString())
-        // editTextMovieClassification.setText(movie?.classification)
+        editTextMovieClassification.setText(movie?.classification)
         editTextMovieBanner.setText(movie?.backdropPath)
         editTextMovieOverview.setText(movie?.overview)
 

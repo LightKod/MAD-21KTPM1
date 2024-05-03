@@ -209,7 +209,7 @@ class HomeFragment : Fragment() {
         textViewMovieName.text = movieList[1].name
         textViewMovieInfo.text = movieList[1].premiereDate.split("T")[0]
         Glide.with(this)
-            .load("https://image.tmdb.org/t/p/original" + movieList[1].poster)
+            .load(movieList[1].poster)
             .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
             .into(imageViewDashboardBackground)
         setMovieClassification(movieList[1])
@@ -282,7 +282,7 @@ class HomeFragment : Fragment() {
                 textViewMovieName.text = item.name
                 textViewMovieInfo.text = item.premiereDate.split("T")[0]
                 Glide.with(this@HomeFragment)
-                    .load("https://image.tmdb.org/t/p/original" + item.poster)
+                    .load(item.poster)
                     .placeholder(R.drawable.black)
                     .apply(RequestOptions.bitmapTransform(BlurTransformation(25, 3)))
                     .into(imageViewDashboardBackground)
