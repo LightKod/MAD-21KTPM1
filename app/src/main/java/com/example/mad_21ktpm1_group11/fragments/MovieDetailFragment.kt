@@ -1,5 +1,6 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,22 +9,32 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.VideoView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.api.AccountApi
 import com.example.mad_21ktpm1_group11.api.AuthService
+import com.example.mad_21ktpm1_group11.api.GenreApi
 import com.example.mad_21ktpm1_group11.api.MovieApi
+import com.example.mad_21ktpm1_group11.api.PersonApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.AuthResponse
+import com.example.mad_21ktpm1_group11.models.Genre
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Person
 import com.example.mad_21ktpm1_group11.models.Review
+import com.example.mad_21ktpm1_group11.models.User
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class MovieDetailFragment : Fragment() {
     private lateinit var root: View;
@@ -40,6 +51,8 @@ class MovieDetailFragment : Fragment() {
     private lateinit var textMovieName: TextView
     private lateinit var textDate: TextView
     private lateinit var textTime: TextView
+    private lateinit var textGenre: TextView
+    private lateinit var textRated: TextView
     private lateinit var textDescription: TextView
     private lateinit var textCast: TextView
     private lateinit var textDirector: TextView
@@ -123,13 +136,11 @@ class MovieDetailFragment : Fragment() {
         textDescription = root.findViewById(R.id.textDescription)
         textCast = root.findViewById(R.id.textCast)
         textDirector = root.findViewById(R.id.textDirector)
+        textRated = root.findViewById(R.id.textRated)
+        textGenre = root.findViewById(R.id.textGenre)
 
         btnBook.setOnClickListener {
-            val args = Bundle()
-            args.putInt("movieId",movieID)
-            val fragment = BookingTimeFragment()
-            fragment.arguments = args
-            (this.activity as? MainActivity)?.addFragment(fragment,"bookingTime")
+            tryOrder()
         }
 
         btnReview.setOnClickListener{
@@ -147,11 +158,45 @@ class MovieDetailFragment : Fragment() {
         textTime.text = formatTime((movie.duration))
         textDirector.text = people[0].name
         textCast.text = namesString
+        textDescription.text = movie.overview
+        textRated.text = movie.classification
+
+        getGenresNamesByIds(movie.genreIds) { namesString ->
+            // Set the text of textGenre.text with the resulting names string
+            textGenre.text = namesString
+        }
+
 
         Glide.with(this).load( "https://image.tmdb.org/t/p/original" + movie.poster).into(imagePoster)
         Glide.with(this).load( "https://image.tmdb.org/t/p/original" + movie.backdropPath).into(imageBackdrop)
     }
 
+    fun getGenresNamesByIds(ids: List<Int>, callback: (String) -> Unit) {
+        val namesList = mutableListOf<String>()
+        val genreApi = RetrofitClient.instance.create(GenreApi::class.java)
+        // Iterate through each ID and fetch the corresponding genre's name
+        ids.forEach { id ->
+            genreApi.getGenreByID(id).enqueue(object : Callback<Genre> {
+                override fun onResponse(call: Call<Genre>, response: Response<Genre>) {
+                    if (response.isSuccessful) {
+                        val genre = response.body()
+                        if (genre != null) {
+                            namesList.add(genre.name)
+                        }
+                    }
+                    // Check if all names have been fetched
+                    if (namesList.size == ids.size) {
+                        // Concatenate the names into a single string separated by commas
+                        val namesString = namesList.joinToString(", ")
+                        callback(namesString)
+                    }
+                }
+
+                override fun onFailure(call: Call<Genre>, t: Throwable) {
+                }
+            })
+        }
+    }
 
     private fun formatTime(minutes: Int): String {
         val hours = minutes / 60
@@ -166,8 +211,39 @@ class MovieDetailFragment : Fragment() {
         }
     }
     private fun extractDate(dateTimeString: String): String {
-        // Split the string using "T" as the delimiter and get the first part
-        val datePart = dateTimeString.split("T")[0]
-        return datePart
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val date = inputFormat.parse(dateTimeString)
+        return outputFormat.format(date)
+    }
+
+    private fun tryOrder(){
+        val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+
+        if (token != "") {
+            val accountService = RetrofitClient.instance.create(AccountApi::class.java)
+            val call = accountService.getUserDetail(token)
+            call.enqueue(object : Callback<User> {
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    if (response.isSuccessful) {
+                        val args = Bundle()
+                        args.putInt("movieId",movieID)
+                        val fragment = BookingTimeFragment()
+                        fragment.arguments = args
+                        (this@MovieDetailFragment.activity as? MainActivity)?.addFragment(fragment,"bookingTime")
+
+                    } else {
+                        (this@MovieDetailFragment.activity as? MainActivity)?.addFragment(LoginFragment(), "login")
+                    }
+                }
+
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    Log.i("API", t.message!!)
+                }
+            })
+        }else{
+            (this@MovieDetailFragment.activity as? MainActivity)?.addFragment(LoginFragment(), "login")
+        }
     }
 }

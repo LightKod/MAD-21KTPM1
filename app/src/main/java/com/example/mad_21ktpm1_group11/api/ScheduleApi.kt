@@ -2,8 +2,12 @@ package com.example.mad_21ktpm1_group11.api
 
 import com.example.mad_21ktpm1_group11.models.CinemaSchedule
 import com.example.mad_21ktpm1_group11.models.Schedule
+import okhttp3.ResponseBody
 import retrofit2.Call
+import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -13,6 +17,13 @@ interface ScheduleApi {
 
     @GET("schedule")
     fun GetAllSchedule(): Call<List<Schedule>>
+
+
+    @POST("schedule/new")
+    fun addSchedule(@Body schedule: Schedule): Call<ResponseBody>
+
+    @DELETE("schedule/delete/{id}")
+    fun deleteScheduleById(@Path("id") id: Int): Call<ResponseBody>
 
     @GET("schedule/{id}/tickets")
     fun GetScheduleTickets(@Path("id") id: Int): Call<List<String>>

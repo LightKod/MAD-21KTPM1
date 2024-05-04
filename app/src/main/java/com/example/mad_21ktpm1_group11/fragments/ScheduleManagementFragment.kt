@@ -93,11 +93,11 @@ class ScheduleManagementFragment : Fragment() {
         addScheduleButton = root.findViewById(R.id.addScheduleBtn)
 
         addScheduleButton.setOnClickListener {
-            val fragment = MovieManagementDetailFragment()
+            val fragment = ScheduleEditFragment()
             fragment.arguments = Bundle().apply {
                 putString("type", "add")
             }
-            //(this.activity as? MainActivity)?.addFragment(fragment, "movie_management_detail")
+            (this.activity as? MainActivity)?.addFragment(fragment, "schedule_edit")
         }
 
 
@@ -109,12 +109,12 @@ class ScheduleManagementFragment : Fragment() {
         recyclerViewScheduleList.addItemDecoration(dividerItemDecoration)
 
         adapter.onItemClick = {id ->
-            val fragment = MovieManagementDetailFragment()
+            val fragment = ScheduleEditFragment()
             fragment.arguments = Bundle().apply {
                 putString("type", "edit")
                 putInt("id", id)
             }
-            //(this.activity as? MainActivity)?.addFragment(fragment, "movie_management_detail")
+            (this.activity as? MainActivity)?.addFragment(fragment, "schedule_edit")
         }
     }
 
