@@ -11,6 +11,12 @@ interface ScheduleApi {
     @GET("schedule/{id}")
     fun GetScheduleByID(@Path("id") id: Int): Call<Schedule>
 
+    @GET("schedule")
+    fun GetAllSchedule(): Call<List<Schedule>>
+
+    @GET("schedule/{id}/tickets")
+    fun GetScheduleTickets(@Path("id") id: Int): Call<List<String>>
+
     @GET("schedule/by-date-movie-cinema")
     fun getSchedulesByDateMovieCinema(
         @Query("date") date: String?,

@@ -10,5 +10,5 @@ data class Schedule(
     @SerializedName("cinema_id") val cinemaId: Int,
     @SerializedName("schedule_date") val scheduleDate: Long,
     @SerializedName("schedule_start") val scheduleStart: String,
-    @SerializedName("booked_seats") val seats: List<Int>
+    @SerializedName("booked_seats") val seats: List<Int>,
 ): Serializable
