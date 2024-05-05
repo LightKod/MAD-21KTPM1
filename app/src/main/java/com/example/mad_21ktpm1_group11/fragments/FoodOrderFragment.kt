@@ -1,5 +1,6 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.adapters.RecyclerViewFoodAdapter
+import com.example.mad_21ktpm1_group11.api.AccountApi
 import com.example.mad_21ktpm1_group11.api.FoodApi
 import com.example.mad_21ktpm1_group11.api.OrderApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
@@ -21,6 +23,7 @@ import com.example.mad_21ktpm1_group11.models.Food
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Order
 import com.example.mad_21ktpm1_group11.models.Schedule
+import com.example.mad_21ktpm1_group11.models.User
 import com.google.gson.Gson
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -45,6 +48,7 @@ class FoodOrderFragment : Fragment() {
 
     private var currentPrice: Double = 0.0;
     private var selectedSeatID: String = "";
+    private var userId: String = "";
     private lateinit var schedule: Schedule;
     private var movieName = "";
 
@@ -112,7 +116,7 @@ class FoodOrderFragment : Fragment() {
         buttonPay = root.findViewById(R.id.buttonPay)
 
         buttonPay.setOnClickListener{
-            SubmitData()
+            tryPostOrder()
         }
     }
 
@@ -120,6 +124,7 @@ class FoodOrderFragment : Fragment() {
     {
         val order = Order(
             orderId = Random.nextInt(Int.MAX_VALUE),
+            userId = userId,
             tickets = stringToIntList(selectedSeatID),
             food = getFoodIds(),
             scheduleId = schedule.scheduleId,
@@ -155,6 +160,34 @@ class FoodOrderFragment : Fragment() {
                 Log.i("API", "Upload failed")
             }
         })
+    }
+
+
+    private fun tryPostOrder(){
+        val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+        val token = sharedPref.getString("token", "") ?: ""
+
+        if (token != "") {
+            val accountService = RetrofitClient.instance.create(AccountApi::class.java)
+            val call = accountService.getUserDetail(token)
+            call.enqueue(object : Callback<User> {
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    if (response.isSuccessful) {
+                        val user = response.body()!!
+                        userId = user.id
+                        SubmitData()
+                    } else {
+                        (this@FoodOrderFragment.activity as? MainActivity)?.addFragment(LoginFragment(), "login")
+                    }
+                }
+
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    Log.i("API", t.message!!)
+                }
+            })
+        }else{
+            (this@FoodOrderFragment.activity as? MainActivity)?.addFragment(LoginFragment(), "login")
+        }
     }
 
     private fun switchFragment(fragment: Fragment){
@@ -218,8 +251,8 @@ class FoodOrderFragment : Fragment() {
         return foodIds
     }
 
-    fun stringToIntList(idsString: String): List<Int> {
-        return idsString.split("|").map { it.toInt() }
+    fun stringToIntList(idsString: String): List<String> {
+        return idsString.split("|").map { it }
     }
 
 }

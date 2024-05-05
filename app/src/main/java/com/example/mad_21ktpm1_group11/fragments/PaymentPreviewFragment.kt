@@ -11,14 +11,19 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
+import com.example.mad_21ktpm1_group11.adapters.RecyclerPaymentFoodAdapter
 import com.example.mad_21ktpm1_group11.api.CinemaApi
+import com.example.mad_21ktpm1_group11.api.FoodApi
 import com.example.mad_21ktpm1_group11.api.MovieApi
 import com.example.mad_21ktpm1_group11.api.OrderApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.Cinema
+import com.example.mad_21ktpm1_group11.models.FoodPayment
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Order
 import com.example.mad_21ktpm1_group11.zalo.CreateOrder
@@ -56,17 +61,23 @@ class PaymentPreviewFragment : Fragment() {
     private  lateinit var textViewFoodAndDrink: TextView
     private  lateinit var textViewOriginalTotal: TextView
     private  lateinit var imageViewMoviePoster: ImageView
+    private  lateinit var textViewTicketQuantity:TextView
+    private  lateinit var textViewTicketTotal:TextView
+    private  lateinit var textViewFoodAndBeverageTotal:TextView
 
+    private  lateinit var recyclerViewFoodAndBeverageList:RecyclerView
+    private  lateinit var FoodPaymentAdapter :RecyclerPaymentFoodAdapter
 
-
+    private  lateinit var ListFood : List<FoodPayment>
 
     private lateinit var  order: Order
     private  var movie: Movie ?= null
     private  var cinema: Cinema?= null
-
     private val movieService = RetrofitClient.instance.create(MovieApi::class.java)
     private val cinemaService = RetrofitClient.instance.create(CinemaApi::class.java)
     private val orderService = RetrofitClient.instance.create(OrderApi::class.java)
+    private val foodService = RetrofitClient.instance.create(FoodApi::class.java)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -104,6 +115,10 @@ class PaymentPreviewFragment : Fragment() {
         textViewBookingTime.setText(timeString)
         textViewCinemaName.setText(movie?.name)
         textViewOriginalTotal.setText(order.total.toString())
+        textViewTicketQuantity.setText(order.tickets.count().toString())
+        textViewTicketTotal.setText(order.totalTicket.toString())
+        textViewFoodAndBeverageTotal.setText(order.totalFood.toString())
+
         Glide.with(this).load(movie?.poster).into(imageViewMoviePoster)
 
     }
@@ -155,7 +170,6 @@ class PaymentPreviewFragment : Fragment() {
                     cinema = response.body()!!
                     textViewCinemaName.setText(cinema?.name)
                     Log.i("MovieData", response.body().toString())
-                    setData()
                 } else {
                     val errorMessage = response.message()
                     Log.i("APIMovie", errorMessage)
@@ -163,6 +177,28 @@ class PaymentPreviewFragment : Fragment() {
                 }
             }
             override fun onFailure(call: Call<Cinema>, t: Throwable) {
+                Log.i("APIMovie", t.message!!)
+            }
+
+        })
+        val callFood = foodService.getFoodByOrder(order.orderId)
+        callFood.enqueue(object : Callback<List<FoodPayment>> {
+            override fun onResponse(call: Call<List<FoodPayment>>, response: Response<List<FoodPayment>>) {
+                Log.i("testneh", "aaaaaaaaaaaaaaaaaaa")
+
+                if (response.isSuccessful) {
+                    // Handle successful response
+                    Log.i("testneh", "aaaaaaaaaaaaaaaaaaa")
+                    ListFood = response.body()!!
+                    FoodPaymentAdapter = RecyclerPaymentFoodAdapter(this@PaymentPreviewFragment,ListFood)
+                    recyclerViewFoodAndBeverageList.adapter =FoodPaymentAdapter
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("APIMovie", errorMessage)
+                    Log.i("APIMovie", "GET FAILED")
+                }
+            }
+            override fun onFailure(call: Call<List<FoodPayment>>, t: Throwable) {
                 Log.i("APIMovie", t.message!!)
             }
 
@@ -294,9 +330,16 @@ class PaymentPreviewFragment : Fragment() {
         textViewFoodAndDrink = view.findViewById(R.id.textViewFoodAndDrink)
         textViewOriginalTotal = view.findViewById(R.id.textViewOriginalTotal)
         imageViewMoviePoster = view.findViewById(R.id.imageViewMoviePoster)
+        textViewTicketQuantity  = view.findViewById(R.id.textViewTicketQuantity)
+        textViewTicketTotal  = view.findViewById(R.id.textViewTicketTotal)
+        textViewFoodAndBeverageTotal = view.findViewById(R.id.textViewFoodAndBeverageTotal)
+        recyclerViewFoodAndBeverageList=view.findViewById(R.id.recyclerViewFoodAndBeverageList)
+        recyclerViewFoodAndBeverageList.addItemDecoration(BookingTimeFragment.MarginItem(20))
+
+        recyclerViewFoodAndBeverageList.layoutManager = LinearLayoutManager(this.context,
+            LinearLayoutManager.VERTICAL,false)
+
     }
-     fun onNewIntent(intent: Intent) {
-        ZaloPaySDK.getInstance().onResult(intent)
-    }
+
 
 }

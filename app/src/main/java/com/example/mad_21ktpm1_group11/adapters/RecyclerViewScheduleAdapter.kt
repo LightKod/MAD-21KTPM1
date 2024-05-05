@@ -7,12 +7,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.api.CinemaApi
 import com.example.mad_21ktpm1_group11.api.MovieApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
+import com.example.mad_21ktpm1_group11.api.ScheduleApi
 import com.example.mad_21ktpm1_group11.models.Cinema
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Schedule
@@ -25,6 +30,7 @@ import java.util.Date
 class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var schedules: List<Schedule>) : RecyclerView.Adapter<RecyclerViewScheduleAdapter.ViewHolder>() {
     private val movieService = RetrofitClient.instance.create(MovieApi::class.java)
     private val cinemaApi = RetrofitClient.instance.create(CinemaApi::class.java)
+    private val scheduleApi = RetrofitClient.instance.create(ScheduleApi::class.java)
     lateinit var onItemClick: ((Int) -> Unit)
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view){
@@ -64,10 +70,10 @@ class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var s
         holder.textDate.text = formattedDate
         holder.textTime.text = item.scheduleStart
         holder.textRoom.text = "Room ${item.roomId}"
-        holder.textTicketSold.text = "${item.seats.count()} tickets sold"
 
 
-        movieService.getMovieByID(item.movieId).enqueue(object : Callback<Movie> {
+
+        movieService.getMovieByID(item.movieId).enqueue(fragment, object : Callback<Movie> {
             override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
                 if (response.isSuccessful) {
                     holder.textMovieName.text = response.body()!!.name
@@ -82,7 +88,7 @@ class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var s
         })
 
 
-        cinemaApi.getCinemaById(item.cinemaId).enqueue(object : Callback<Cinema> {
+        cinemaApi.getCinemaById(item.cinemaId).enqueue(fragment, object : Callback<Cinema> {
             override fun onResponse(call: Call<Cinema>, response: Response<Cinema>) {
                 if (response.isSuccessful) {
                     holder.textCinemaName.text = response.body()!!.name
@@ -96,7 +102,36 @@ class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var s
                 holder.textCinemaName.text = item.cinemaId.toString()
             }
         })
+
+
+        scheduleApi.getScheduleTickets(item.scheduleId).enqueue(fragment, object: Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                if (response.isSuccessful) {
+                    val res =response.body()!!
+                    holder.textTicketSold.text = "${res.count()} tickets sold"
+
+                } else {
+                    holder.textTicketSold.text = "-1 ticket sold"
+                }
+            }
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                Log.i("API", "Get cinema failed")
+                Log.i("API", t.message!!)
+                holder.textCinemaName.text = item.cinemaId.toString()
+            }
+        })
     }
+
+    fun <T> Call<T>.enqueue(lifecycleOwner: LifecycleOwner, callback: Callback<T>) {
+        lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun cancelCalls() {
+                this@enqueue.cancel()
+            }
+        })
+        this.enqueue(callback)
+    }
+
 
     fun updateList(newList: List<Schedule>){
         schedules = newList

@@ -55,6 +55,7 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     private val PADDING_VER = 500;
 
     private lateinit var seats: Array<Array<Seat>>
+    private lateinit var bookedSeats: List<String>
     val chosenSeats:  MutableCollection<Seat> = mutableListOf();
 
     var scheduleID = 955958
@@ -63,6 +64,8 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     lateinit var room: Room;
     lateinit var movie: Movie;
 
+    var userId: String = ""
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,10 +73,16 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
     ): View? {
         // Inflate the layout for this fragment
         root = inflater.inflate(R.layout.fragment_seat_selection, container, false)
-        arguments?.takeIf { it.containsKey("schedule") }?.apply {
+        arguments?.takeIf {
+            it.containsKey("schedule") }?.apply {
             schedule = getSerializable("schedule") as Schedule
         }
+        arguments?.takeIf {
+            it.containsKey("userId") }?.apply {
+            userId = getString("userId")!!
+        }
         Log.i("API", schedule.scheduleId.toString())
+        Log.i("API", "User id: "+ userId)
 
         init();
         //TODO: add a step to fetch data here
@@ -97,10 +106,11 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             if(chosenSeats.count() == 0) return@setOnClickListener;
             var fragment = FoodOrderFragment()
             val args = Bundle()
-            val idsString = chosenSeats.joinToString(separator = "|") { it.id.toString() }
+            val idsString = chosenSeats.joinToString(separator = "|") { it.name.toString() }
             Log.i("API", "Test: " + idsString)
             args.putSerializable("schedule", schedule)
             args.putString("selectedSeatID", idsString)
+            args.putString("userId", userId)
             args.putDouble("currentPrice", chosenSeats.sumOf{it.price})
             args.putString("movieName", movie.name)
             fragment.arguments = args;
@@ -140,10 +150,7 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
                 if (response.isSuccessful) {
                     room = response.body()!!
                     Log.i("API", "Fetched Room")
-
-                    updateOrderDetails()
-                    setupView()
-                    populateView()
+                    fetchBookedSeats()
 
                 } else {
                     val errorMessage = response.message()
@@ -179,6 +186,32 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             }
         })
     }
+
+    private fun fetchBookedSeats(){
+        val scheduleService = RetrofitClient.instance.create(ScheduleApi::class.java)
+        val call = scheduleService.getScheduleTickets(schedule.scheduleId)
+        call.enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                if (response.isSuccessful) {
+                    bookedSeats = response.body()!!
+                    updateOrderDetails()
+                    setupView()
+                    populateView()
+                    Log.i("API", "Fetched Booked Seats: " + bookedSeats.count().toString() + " tickets")
+                } else {
+                    val errorMessage = response.message()
+                    Log.i("API", errorMessage)
+                    Log.i("API", "GET FAILED")
+                }
+            }
+
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                Log.i("API", t.message!!)
+            }
+        })
+    }
+
+
     private fun updateOrderDetails(){
         textMovieName.text = movie.name
         textPrice.text = formatToVND(chosenSeats.sumOf{it.price});
@@ -254,6 +287,12 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
             {
                 val seatName = mapToAlphabet(y)+x.toString();
                 seats[y][x].name = seatName;
+                if(seats[y][x].name in bookedSeats){
+                    Log.i("API", "Booked: " + seats[y][x].name)
+                    seats[y][x].defaultStatus = Seat.Companion.SeatStatus.Booked
+                    seats[y][x].status = Seat.Companion.SeatStatus.Booked
+                    seats[y][x].defaultColor = Seat.Companion.SeatStatus.Booked.color
+                }
 
                 //Log.i("SEAT", x.toString() + "|" + y.toString() +": " + seats[y][x].status.toString())
             }
@@ -282,6 +321,10 @@ class SeatSelectionFragment : Fragment(), View.OnTouchListener {
                 seatButton.setOnClickListener {
                     when(seatData.status) {
                         Seat.Companion.SeatStatus.None -> {
+
+                        }
+
+                        Seat.Companion.SeatStatus.Booked -> {
 
                         }
 

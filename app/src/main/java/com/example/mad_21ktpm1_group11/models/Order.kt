@@ -4,9 +4,10 @@ import com.google.gson.annotations.SerializedName
 
 data class Order(
     @SerializedName("order_id") val orderId: Int,
+    @SerializedName("user_id") val userId: String,
     @SerializedName("schedule_id") val scheduleId: Int,
     @SerializedName("time") val time: Long,
-    @SerializedName("tickets") val tickets: List<Int>,
+    @SerializedName("tickets") val tickets: List<String>,
     @SerializedName("food") val food: List<Int>,
     @SerializedName("discount") val discount: Double,
     @SerializedName("total") val total: Double,
