@@ -1,5 +1,6 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -181,6 +182,8 @@ class PaymentPreviewFragment : Fragment() {
             }
 
         })
+
+
         val callFood = foodService.getFoodByOrder(order.orderId)
         callFood.enqueue(object : Callback<List<FoodPayment>> {
             override fun onResponse(call: Call<List<FoodPayment>>, response: Response<List<FoodPayment>>) {
@@ -206,10 +209,13 @@ class PaymentPreviewFragment : Fragment() {
     }
     private  fun updateStatus(status:String)
     {
+        val sharedPref = requireContext().getSharedPreferences("auth", Context.MODE_PRIVATE)
+
+        val token = sharedPref.getString("token", "") ?: ""
         val jsonObject = JsonObject()
         jsonObject.addProperty("orderId", order.orderId)
         jsonObject.addProperty("status", status)
-        val call = orderService.updateOrderById(jsonObject)
+        val call = orderService.updateOrderById(token,jsonObject)
         call.enqueue(object : Callback<Order> {
             override fun onResponse(call: Call<Order>, response: Response<Order>) {
                 Log.i("testneh", "aaaaaaaaaaaaaaaaaaa")
