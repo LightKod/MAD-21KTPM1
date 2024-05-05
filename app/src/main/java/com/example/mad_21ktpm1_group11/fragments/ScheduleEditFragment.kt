@@ -536,13 +536,11 @@ class ScheduleEditFragment : Fragment() {
         })
 
         // Set date and time
-        var date = Date(schedule?.scheduleDate?.times(1000) ?: 0)
+        val date = Date(schedule?.scheduleDate?.times(1000) ?: 0)
         val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         editTextDate.setText(
             dateFormat.format(
-                Date(
-                    (schedule?.scheduleDate!!.toLong() * 1000) ?: 0
-                )
+                date
             )
         )
         editTextTime.setText(schedule?.scheduleStart)
@@ -566,7 +564,7 @@ class ScheduleEditFragment : Fragment() {
             override fun onResponse(call: Call<Room>, response: Response<Room>) {
                 if (response.isSuccessful) {
                     selectedRoom = response.body()
-                    editTextRoom.setText("Room ${selectedRoom?.room_id}")
+                    editTextRoom.setText("Room ${schedule!!.roomId}")
                 }
             }
 
@@ -583,33 +581,13 @@ class ScheduleEditFragment : Fragment() {
         val date = editTextDate.text.toString()
 
         val movieId = selectedMovie?.id
-        val dateLong = dateToTimestamp(date)
+        val dateLong = dateToTimestamp(date) / 1000
         val time = editTextTime.text.toString()
         val cinemaId = selectedCinema?.id
-        val roomId = selectedRoom?.id
+        val roomId = editTextRoom.text.replace(Regex("[^0-9]"), "").toInt()
 
         if (movieId == null || date.isEmpty() || time.isEmpty() || cinemaId == null || roomId == null) {
-            // Display error messages for each field
-            if (movieId == null) {
-                // Set error message for movie selection
-                // For example, if you're using TextInputLayout for movie selection:
-                // textInputLayoutMovie.error = "Please select a movie"
-                // If not, you can display an error message using Toast or any other method
-            }
-            if (date.isEmpty()) {
-                editTextDate.error = "Date cannot be empty"
-            }
-            if (time.isEmpty()) {
-                editTextTime.error = "Time cannot be empty"
-            }
-            if (cinemaId == null) {
-                // Set error message for cinema selection
-                // Similar to movieId validation
-            }
-            if (roomId == null) {
-                // Set error message for room selection
-                // Similar to movieId validation
-            }
+
             return
         }
 

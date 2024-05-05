@@ -26,7 +26,7 @@ interface ScheduleApi {
     fun deleteScheduleById(@Path("id") id: Int): Call<ResponseBody>
 
     @GET("schedule/{id}/tickets")
-    fun GetScheduleTickets(@Path("id") id: Int): Call<List<String>>
+    fun getScheduleTickets(@Path("id") id: Int): Call<List<String>>
 
     @GET("schedule/by-date-movie-cinema")
     fun getSchedulesByDateMovieCinema(
