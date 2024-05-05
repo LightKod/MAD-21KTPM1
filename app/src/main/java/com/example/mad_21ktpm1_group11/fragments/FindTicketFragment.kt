@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.google.android.material.textfield.TextInputLayout
+import java.lang.Integer.parseInt
 
 class FindTicketFragment : Fragment() {
     private lateinit var backBtn: ImageButton
@@ -67,6 +68,10 @@ class FindTicketFragment : Fragment() {
                     inputLayoutTicketCode.error = "This field cannot be empty"
                     inputLayoutTicketCode.isErrorEnabled = true
                 }
+                else if (!ticketCode.matches(Regex("\\d+"))) {
+                    inputLayoutTicketCode.error = "Please enter a valid ticket code"
+                    inputLayoutTicketCode.isErrorEnabled = true
+                }
                 else{
                     inputLayoutTicketCode.error = ""
                     inputLayoutTicketCode.isErrorEnabled = false
@@ -82,7 +87,11 @@ class FindTicketFragment : Fragment() {
                 Toast.makeText(this.requireContext(), "You haven't completed the form yet", Toast.LENGTH_SHORT).show()
             }
             else{
-                Toast.makeText(this.requireContext(), "Ticket, find yourself!", Toast.LENGTH_SHORT).show()
+                val fragment = TicketDetailFragment()
+                fragment.arguments = Bundle().apply {
+                    putInt("id", parseInt(editTextTicketCode.text.toString()))
+                }
+                (this.activity as? MainActivity)?.addFragment(fragment, "ticket_detail")
             }
         }
     }

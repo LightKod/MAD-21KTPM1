@@ -8,6 +8,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.models.Ticket
+import java.text.SimpleDateFormat
+import java.util.Date
 
 class RecyclerViewTicketAdapter(private val fragment: Fragment, private val tickets: List<Ticket>): RecyclerView.Adapter<RecyclerViewTicketAdapter.ViewHolder>() {
     lateinit var onItemClick: ((Int) -> Unit)
@@ -40,11 +42,14 @@ class RecyclerViewTicketAdapter(private val fragment: Fragment, private val tick
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item: Ticket = tickets[position]
+        val date = Date(item.scheduleDate * 1000)
+        val ticketDate = SimpleDateFormat("yyyy-MM-dd").format(date)
+
         holder.textViewMovieName.text = item.movieName
-        holder.textViewTicketDate.text = item.bookingDate
+        holder.textViewTicketDate.text = ticketDate
         holder.textViewCinemaName.text = item.cinemaName
         holder.textViewTicketID.text = item.id.toString()
-        val formattedPrice = item.price + " đ"
+        val formattedPrice = item.total.toString() + " đ"
         holder.textViewTicketPrice.text = formattedPrice
     }
 
