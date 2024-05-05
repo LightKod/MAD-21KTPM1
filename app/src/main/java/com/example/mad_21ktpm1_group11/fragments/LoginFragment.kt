@@ -1,7 +1,12 @@
 package com.example.mad_21ktpm1_group11.fragments
 
+import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Paint
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,16 +17,25 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.example.mad_21ktpm1_group11.MainActivity
 import com.example.mad_21ktpm1_group11.R
 import com.example.mad_21ktpm1_group11.api.AuthService
+import com.example.mad_21ktpm1_group11.api.OrderApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.models.AuthResponse
+import com.example.mad_21ktpm1_group11.models.Ticket
 import com.google.gson.JsonObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import okhttp3.ResponseBody
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class LoginFragment : Fragment() {
     // TODO: Rename and change types of parameters
@@ -58,9 +72,8 @@ class LoginFragment : Fragment() {
                         val editor = sharedPref.edit()
                         editor.putString("token", "Bearer $token")
                         editor.apply()
+                        getAllUnusedTicket("Bearer $token")
 
-                        (this@LoginFragment.activity as? MainActivity)?.toggleNavbarUser()
-                        (this@LoginFragment.activity as? MainActivity)?.addFragment(HomeFragment(), "home")
                     } else {
                         Log.e("Login", "Token is null or empty")
                     }
@@ -101,6 +114,138 @@ class LoginFragment : Fragment() {
         return view
     }
 
+
+    private fun getAllUnusedTicket(token: String){
+        if (token != "") {
+            val orderService = RetrofitClient.instance.create(OrderApi::class.java)
+            val call = orderService.getAllUnusedOrder(token)
+
+            call.enqueue(object : Callback<List<Ticket>> {
+                override fun onResponse(
+                    call: Call<List<Ticket>>,
+                    response: Response<List<Ticket>>
+
+                ) {
+                    Log.i("API", "CCTESTTTT")
+
+                    if (response.isSuccessful) {
+                        // Handle successful response
+                        Log.i("API", "TESTTTT")
+
+                        val ticketList = response.body()!!
+                        clearAllNotificationChannels(this@LoginFragment.requireContext())
+                        createNotificationsForTickets(this@LoginFragment.requireContext(), ticketList)
+
+                        (this@LoginFragment.activity as? MainActivity)?.toggleNavbarUser()
+                        (this@LoginFragment.activity as? MainActivity)?.addFragment(HomeFragment(), "home")
+                        Log.i("API", "ATESTTTT")
+
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Ticket>>, t: Throwable) {
+                    Log.i("API", t.message!!)
+                }
+            })
+        }
+    }
+
+
+    fun createNotificationsForTickets(context: Context, tickets: List<Ticket>) {
+        for (ticket in tickets) {
+            createNotificationChannel(context, ticket)
+        }
+    }
+
+    fun clearAllNotificationChannels(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationManager = context.getSystemService(NotificationManager::class.java)
+            val existingChannels = notificationManager.notificationChannels
+            for (channel in existingChannels) {
+                notificationManager.deleteNotificationChannel(channel.id)
+            }
+        }
+    }
+
+    fun createNotificationChannel(context: Context, ticket: Ticket) {
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        val date = Date(ticket.scheduleDate * 1000)
+        val formattedDate = sdf.format(date)
+
+        val scheduleDateTime = sdf.parse("${formattedDate} ${ticket.scheduleStart}")
+        val calendar = Calendar.getInstance()
+        calendar.time = scheduleDateTime
+        calendar.add(Calendar.HOUR_OF_DAY, -3)
+        val notificationTime = calendar.timeInMillis
+
+        if (notificationTime < System.currentTimeMillis()) {
+            calendar.timeInMillis = System.currentTimeMillis()
+            calendar.add(Calendar.SECOND, 5)
+        }
+
+        val channelId = "ticket_notification"
+        val channelName = "Ticket Notification"
+        val channelDescription = "Prepare to go to the cinema NOW!"
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(channelId, channelName, importance).apply {
+                description = channelDescription
+            }
+            val notificationManager = context.getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        // Schedule the notification
+        scheduleNotification(context, channelId, notificationTime)
+    }
+
+    val PERMISSION_REQUEST_CODE = 101
+    private fun scheduleNotification(context: Context, channelId: String, notificationTime: Long) {
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setContentTitle("Ticket Notification")
+            .setContentText("Your ticket is coming up!")
+            .setSmallIcon(R.drawable.notification)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+        val notificationManager = NotificationManagerCompat.from(context)
+        if (ActivityCompat.checkSelfPermission(
+                this.requireContext(),
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this.requireActivity(),
+                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                PERMISSION_REQUEST_CODE // Define a constant for request code
+            )
+            return
+        }
+        //val currentTime = Calendar.getInstance().timeInMillis
+        //val notificationTimeTest = currentTime + 10 * 1000
+        notificationManager.notify(notificationTime.toInt(), notification)
+        Log.i("Notification", "Successfully set notification")
+    }
+
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == PERMISSION_REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Permission denied. Cannot show notification.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
 
 
 }
