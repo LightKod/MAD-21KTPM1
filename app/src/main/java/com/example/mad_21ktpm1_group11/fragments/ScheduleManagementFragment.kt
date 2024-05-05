@@ -18,6 +18,7 @@ import com.example.mad_21ktpm1_group11.adapters.RecyclerViewScheduleAdapter
 import com.example.mad_21ktpm1_group11.api.MovieApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.api.ScheduleApi
+import com.example.mad_21ktpm1_group11.helper.Helper.Companion.enqueueWithLifecycle
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Schedule
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -58,7 +59,7 @@ class ScheduleManagementFragment : Fragment() {
     private fun fetchData(){
         val scheduleService = RetrofitClient.instance.create(ScheduleApi::class.java)
 
-        scheduleService.GetAllSchedule().enqueue(object : Callback<List<Schedule>> {
+        scheduleService.GetAllSchedule().enqueueWithLifecycle(this@ScheduleManagementFragment ,object : Callback<List<Schedule>> {
             override fun onResponse(call: Call<List<Schedule>>, response: Response<List<Schedule>>) {
                 if (response.isSuccessful) {
                     adapter.updateList(ArrayList(response.body()!!))

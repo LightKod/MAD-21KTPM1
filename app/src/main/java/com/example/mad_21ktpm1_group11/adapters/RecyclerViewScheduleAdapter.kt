@@ -7,6 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.mad_21ktpm1_group11.R
@@ -69,7 +73,7 @@ class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var s
 
 
 
-        movieService.getMovieByID(item.movieId).enqueue(object : Callback<Movie> {
+        movieService.getMovieByID(item.movieId).enqueue(fragment, object : Callback<Movie> {
             override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
                 if (response.isSuccessful) {
                     holder.textMovieName.text = response.body()!!.name
@@ -84,7 +88,7 @@ class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var s
         })
 
 
-        cinemaApi.getCinemaById(item.cinemaId).enqueue(object : Callback<Cinema> {
+        cinemaApi.getCinemaById(item.cinemaId).enqueue(fragment, object : Callback<Cinema> {
             override fun onResponse(call: Call<Cinema>, response: Response<Cinema>) {
                 if (response.isSuccessful) {
                     holder.textCinemaName.text = response.body()!!.name
@@ -100,7 +104,7 @@ class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var s
         })
 
 
-        scheduleApi.getScheduleTickets(item.scheduleId).enqueue(object : Callback<List<String>> {
+        scheduleApi.getScheduleTickets(item.scheduleId).enqueue(fragment, object: Callback<List<String>> {
             override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
                 if (response.isSuccessful) {
                     val res =response.body()!!
@@ -117,6 +121,17 @@ class RecyclerViewScheduleAdapter(private val fragment : Fragment, private var s
             }
         })
     }
+
+    fun <T> Call<T>.enqueue(lifecycleOwner: LifecycleOwner, callback: Callback<T>) {
+        lifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun cancelCalls() {
+                this@enqueue.cancel()
+            }
+        })
+        this.enqueue(callback)
+    }
+
 
     fun updateList(newList: List<Schedule>){
         schedules = newList
