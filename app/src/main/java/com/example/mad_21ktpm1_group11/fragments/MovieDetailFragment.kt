@@ -228,6 +228,7 @@ class MovieDetailFragment : Fragment() {
                 override fun onResponse(call: Call<User>, response: Response<User>) {
                     if (response.isSuccessful) {
                         val args = Bundle()
+                        val user = response.body()!!
                         args.putInt("movieId",movieID)
                         val fragment = BookingTimeFragment()
                         fragment.arguments = args

@@ -30,6 +30,7 @@ import com.example.mad_21ktpm1_group11.api.MovieApi
 import com.example.mad_21ktpm1_group11.api.RetrofitClient
 import com.example.mad_21ktpm1_group11.api.RoomApi
 import com.example.mad_21ktpm1_group11.api.ScheduleApi
+import com.example.mad_21ktpm1_group11.helper.Helper.Companion.enqueueWithLifecycle
 import com.example.mad_21ktpm1_group11.models.Cinema
 import com.example.mad_21ktpm1_group11.models.Movie
 import com.example.mad_21ktpm1_group11.models.Room
@@ -158,7 +159,7 @@ class ScheduleEditFragment : Fragment() {
         editTextMovieName.setOnClickListener {
             val call = movieService.getAllMovies()
 
-            call.enqueue(object : Callback<List<Movie>> {
+            call.enqueueWithLifecycle(this, object : Callback<List<Movie>> {
                 override fun onResponse(call: Call<List<Movie>>, response: Response<List<Movie>>) {
                     if (response.isSuccessful) {
                         // Handle successful response
@@ -250,7 +251,7 @@ class ScheduleEditFragment : Fragment() {
         editTextCinema.setOnClickListener {
             val call = cinemaService.getAllCinemas()
 
-            call.enqueue(object : Callback<List<Cinema>> {
+            call.enqueueWithLifecycle(this, object : Callback<List<Cinema>> {
                 override fun onResponse(
                     call: Call<List<Cinema>>,
                     response: Response<List<Cinema>>
@@ -343,7 +344,7 @@ class ScheduleEditFragment : Fragment() {
         editTextRoom.setOnClickListener {
             val call = roomService.GetAllRoom();
 
-            call.enqueue(object : Callback<List<Room>> {
+            call.enqueueWithLifecycle(this, object : Callback<List<Room>> {
                 override fun onResponse(call: Call<List<Room>>, response: Response<List<Room>>) {
                     if (response.isSuccessful) {
                         // Handle successful response
@@ -498,7 +499,7 @@ class ScheduleEditFragment : Fragment() {
     private fun fetchData() {
         val call = scheduleService.GetScheduleByID(id)
 
-        call.enqueue(object : Callback<Schedule> {
+        call.enqueueWithLifecycle(this, object : Callback<Schedule> {
             override fun onResponse(call: Call<Schedule>, response: Response<Schedule>) {
                 if (response.isSuccessful) {
                     // Handle successful response
@@ -520,7 +521,7 @@ class ScheduleEditFragment : Fragment() {
     private fun setData() {
         if (schedule == null) return
         val fragment = this
-        movieService.getMovieByID(schedule!!.movieId).enqueue(object : Callback<Movie> {
+        movieService.getMovieByID(schedule!!.movieId).enqueueWithLifecycle(this ,object : Callback<Movie> {
             override fun onResponse(call: Call<Movie>, response: Response<Movie>) {
                 if (response.isSuccessful) {
                     selectedMovie = response.body()
@@ -536,19 +537,17 @@ class ScheduleEditFragment : Fragment() {
         })
 
         // Set date and time
-        var date = Date(schedule?.scheduleDate?.times(1000) ?: 0)
+        val date = Date(schedule?.scheduleDate?.times(1000) ?: 0)
         val dateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         editTextDate.setText(
             dateFormat.format(
-                Date(
-                    (schedule?.scheduleDate!!.toLong() * 1000) ?: 0
-                )
+                date
             )
         )
         editTextTime.setText(schedule?.scheduleStart)
 
         // Set cinema
-        cinemaService.getCinemaById(schedule!!.cinemaId).enqueue(object : Callback<Cinema> {
+        cinemaService.getCinemaById(schedule!!.cinemaId).enqueueWithLifecycle(this, object : Callback<Cinema> {
             override fun onResponse(call: Call<Cinema>, response: Response<Cinema>) {
                 if (response.isSuccessful) {
                     selectedCinema = response.body()
@@ -562,11 +561,11 @@ class ScheduleEditFragment : Fragment() {
         })
 
         // Set room
-        roomService.GetRoomById(schedule!!.roomId).enqueue(object : Callback<Room> {
+        roomService.GetRoomById(schedule!!.roomId).enqueueWithLifecycle(this, object : Callback<Room> {
             override fun onResponse(call: Call<Room>, response: Response<Room>) {
                 if (response.isSuccessful) {
                     selectedRoom = response.body()
-                    editTextRoom.setText("Room ${selectedRoom?.room_id}")
+                    editTextRoom.setText("Room ${schedule!!.roomId}")
                 }
             }
 
@@ -583,33 +582,13 @@ class ScheduleEditFragment : Fragment() {
         val date = editTextDate.text.toString()
 
         val movieId = selectedMovie?.id
-        val dateLong = dateToTimestamp(date)
+        val dateLong = dateToTimestamp(date) / 1000
         val time = editTextTime.text.toString()
         val cinemaId = selectedCinema?.id
-        val roomId = selectedRoom?.id
+        val roomId = editTextRoom.text.replace(Regex("[^0-9]"), "").toInt()
 
         if (movieId == null || date.isEmpty() || time.isEmpty() || cinemaId == null || roomId == null) {
-            // Display error messages for each field
-            if (movieId == null) {
-                // Set error message for movie selection
-                // For example, if you're using TextInputLayout for movie selection:
-                // textInputLayoutMovie.error = "Please select a movie"
-                // If not, you can display an error message using Toast or any other method
-            }
-            if (date.isEmpty()) {
-                editTextDate.error = "Date cannot be empty"
-            }
-            if (time.isEmpty()) {
-                editTextTime.error = "Time cannot be empty"
-            }
-            if (cinemaId == null) {
-                // Set error message for cinema selection
-                // Similar to movieId validation
-            }
-            if (roomId == null) {
-                // Set error message for room selection
-                // Similar to movieId validation
-            }
+
             return
         }
 
@@ -629,7 +608,7 @@ class ScheduleEditFragment : Fragment() {
         )
         val call = scheduleService.addSchedule(schedule)
 
-        call.enqueue(object : Callback<ResponseBody> {
+        call.enqueueWithLifecycle(this, object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     // Handle successful response
@@ -659,7 +638,7 @@ class ScheduleEditFragment : Fragment() {
 
         builder.setPositiveButton("Yes") { dialog, which ->
             val call = scheduleService.deleteScheduleById(schedule!!.scheduleId)
-            call.enqueue(object : Callback<ResponseBody> {
+            call.enqueueWithLifecycle(this, object : Callback<ResponseBody> {
                 override fun onResponse(
                     call: Call<ResponseBody>,
                     response: Response<ResponseBody>
