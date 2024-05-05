@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var manageMoviesBtn: Button
 
     var isLoggedIn: Boolean = true
-    var isAdmin: Boolean = true
+    var isAdmin: Boolean = false
     private lateinit var loginBtn: TextView
     private lateinit var userName: TextView
     private lateinit var memberCode: TextView
@@ -167,6 +167,8 @@ class MainActivity : AppCompatActivity() {
             editor.remove("token")
             editor.apply()
             toggleNavbarUser()
+            manageScheduleBtn.visibility = View.GONE
+            manageMoviesBtn.visibility = View.GONE
             addFragment(HomeFragment(), "home")
         }
     }
@@ -261,7 +263,10 @@ class MainActivity : AppCompatActivity() {
                         // Handle successful response
                         val user = response.body()!!
                         userName.text = user.name
-                        // isAdmin = user.role == "admin"
+                        isAdmin = user.role == "admin"
+
+                        manageScheduleBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
+                        manageMoviesBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
                     } else {
                         if(response.code() == 401){
                             Toast.makeText(this@MainActivity.applicationContext, "Token expired, please log in again.", Toast.LENGTH_SHORT).show()
@@ -284,8 +289,6 @@ class MainActivity : AppCompatActivity() {
         memberCode.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
         userCode.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
         logoutBtn.visibility = if(isLoggedIn) View.VISIBLE else View.GONE
-        manageScheduleBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
-        manageMoviesBtn.visibility = if(isLoggedIn && isAdmin) View.VISIBLE else View.GONE
     }
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)

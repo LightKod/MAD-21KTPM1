@@ -286,7 +286,8 @@
             android:textAllCaps="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ticket_btn" />
+            app:layout_constraintTop_toBottomOf="@id/ticket_btn"
+            android:visibility="gone"/>
 
         <android.widget.Button
             android:id="@+id/manage_movies_btn"
@@ -300,7 +301,8 @@
             android:textAllCaps="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/manage_schedule_btn" />
+            app:layout_constraintTop_toBottomOf="@id/manage_schedule_btn"
+            android:visibility="gone"/>
 
         <android.widget.Button
             android:id="@+id/logout_btn"
