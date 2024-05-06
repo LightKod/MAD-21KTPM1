@@ -65,6 +65,8 @@ class PaymentPreviewFragment : Fragment() {
     private  lateinit var textViewTicketQuantity:TextView
     private  lateinit var textViewTicketTotal:TextView
     private  lateinit var textViewFoodAndBeverageTotal:TextView
+    private  lateinit var textViewSubtotal :TextView
+    private  lateinit var textViewTotal :TextView
 
     private  lateinit var recyclerViewFoodAndBeverageList:RecyclerView
     private  lateinit var FoodPaymentAdapter :RecyclerPaymentFoodAdapter
@@ -119,7 +121,9 @@ class PaymentPreviewFragment : Fragment() {
         textViewTicketQuantity.setText(order.tickets.count().toString())
         textViewTicketTotal.setText(order.totalTicket.toString())
         textViewFoodAndBeverageTotal.setText(order.totalFood.toString())
-
+        textViewSeat.setText(order.tickets.joinToString(separator = ", "))
+        textViewSubtotal.setText(order.total.toString())
+        textViewTotal.setText(order.total.toString())
         Glide.with(this).load(movie?.poster).into(imageViewMoviePoster)
 
     }
@@ -148,6 +152,7 @@ class PaymentPreviewFragment : Fragment() {
                     Log.i("testneh","aaaaaaaaaaaaaaaaaaa")
                     movie = response.body()!!
                     Log.i("MovieData",response.body().toString())
+
                     setData()
                 } else {
                     val errorMessage = response.message()
@@ -193,6 +198,18 @@ class PaymentPreviewFragment : Fragment() {
                     // Handle successful response
                     Log.i("testneh", "aaaaaaaaaaaaaaaaaaa")
                     ListFood = response.body()!!
+                    if(ListFood.count()>0)
+                    {
+                        val chuoiKetQua = ListFood.joinToString(separator = ", ") { foodPayment ->
+                            "${foodPayment.name}x${foodPayment.quantity}"
+                        }
+                        textViewFoodAndDrink.setText(chuoiKetQua)
+
+                    }
+                    else
+                    {
+                        textViewFoodAndDrink.setText("")
+                    }
                     FoodPaymentAdapter = RecyclerPaymentFoodAdapter(this@PaymentPreviewFragment,ListFood)
                     recyclerViewFoodAndBeverageList.adapter =FoodPaymentAdapter
                 } else {
@@ -341,6 +358,8 @@ class PaymentPreviewFragment : Fragment() {
         textViewFoodAndBeverageTotal = view.findViewById(R.id.textViewFoodAndBeverageTotal)
         recyclerViewFoodAndBeverageList=view.findViewById(R.id.recyclerViewFoodAndBeverageList)
         recyclerViewFoodAndBeverageList.addItemDecoration(BookingTimeFragment.MarginItem(20))
+        textViewSubtotal = view.findViewById(R.id.textViewSubtotal)
+        textViewTotal = view.findViewById(R.id.textViewTotal)
 
         recyclerViewFoodAndBeverageList.layoutManager = LinearLayoutManager(this.context,
             LinearLayoutManager.VERTICAL,false)

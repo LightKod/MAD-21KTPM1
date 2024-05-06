@@ -142,7 +142,7 @@ class FoodOrderFragment : Fragment() {
         val args = Bundle()
         args.putString("order", jsonOrder)
         args.putInt("movieId",schedule.movieId)
-        args.putInt("cinamaId",schedule.cinemaId)
+        args.putInt("cinemaId",schedule.cinemaId)
         args.putString("roomId",schedule.roomId.toString())
         Log.i("movieId",schedule.movieId.toString())
         fragment.arguments = args;
