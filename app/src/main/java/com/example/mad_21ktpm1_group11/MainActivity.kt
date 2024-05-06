@@ -27,6 +27,7 @@ import com.example.mad_21ktpm1_group11.fragments.MovieManagementFragment
 import com.example.mad_21ktpm1_group11.fragments.NewsAndPromosFragment
 import com.example.mad_21ktpm1_group11.fragments.PaymentPreviewFragment
 import com.example.mad_21ktpm1_group11.fragments.ScheduleManagementFragment
+import com.example.mad_21ktpm1_group11.fragments.TicketFragment
 import com.example.mad_21ktpm1_group11.fragments.UserDashboardFragment
 import com.example.mad_21ktpm1_group11.fragments.VoucherRedeemFragment
 import com.example.mad_21ktpm1_group11.models.Movie
@@ -145,7 +146,7 @@ class MainActivity : AppCompatActivity() {
                 addFragment(LoginFragment(), "login")
             }
             else {
-                addFragment(PaymentPreviewFragment(), "payment")
+                addFragment(TicketFragment(), "ticket")
             }
         }
 
